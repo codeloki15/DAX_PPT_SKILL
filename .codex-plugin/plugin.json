@@ -6,8 +6,8 @@
     "name": "Data Axle",
     "url": "https://www.data-axle.com"
   },
-  "homepage": "https://github.com/data-axle/dax-ppt-skill",
-  "repository": "https://github.com/data-axle/dax-ppt-skill",
+  "homepage": "https://github.com/codeloki15/DAX_PPT_SKILL",
+  "repository": "https://github.com/codeloki15/DAX_PPT_SKILL",
   "license": "MIT",
   "keywords": [
     "powerpoint",
@@ -36,7 +36,7 @@
       "Build me a Data Axle deck on this topic.",
       "Turn this CSV into a consulting-grade presentation."
     ],
-    "websiteURL": "https://github.com/data-axle/dax-ppt-skill",
+    "websiteURL": "https://github.com/codeloki15/DAX_PPT_SKILL",
     "brandColor": "#00A0DC",
     "screenshots": []
   }
