@@ -18,5 +18,6 @@
     "data-axle",
     "consulting-deck"
   ],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "commands": "./commands/"
 }

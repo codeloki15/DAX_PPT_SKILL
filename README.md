@@ -75,6 +75,39 @@ The agent profiles the data, drafts action titles for your approval, builds and
 verifies each slide, opens the live preview for you to edit, and exports the
 `.pptx`.
 
+### Slash commands
+
+Installed as a plugin, the skill adds commands for each stage of building a
+deck. In Claude Code they are namespaced `/dax-ppt-skill:<command>`; Cursor
+picks them up from `commands/` too. In agents without slash commands, just ask
+for the same thing in plain words.
+
+| Command | What it does | Why it matters |
+|---|---|---|
+| `/dax-ppt-skill:dax-ppt` | Loads the skill itself: the full workflow and brand rules | The base layer. Every command below builds on it; the agent also loads it on its own when you mention a deck |
+| `/dax-ppt-skill:new <brief>` | Runs the whole build: brief → storyline → slides → verification → live preview | One command from idea to an editable preview, with every quality gate applied in order |
+| `/dax-ppt-skill:outline <topic>` | Drafts the action titles only, for your sign-off | **The cheapest place to fix a deck.** The titles are the argument; agreeing on them first means no slides get rebuilt because the story was wrong |
+| `/dax-ppt-skill:from-data <file.csv>` | Profiles a CSV/Excel file, finds what the data supports, proposes slides | Enforces **never invent numbers**: every figure comes from a pandas `aggregate` result, so the deck is safe to put in front of a client or board |
+| `/dax-ppt-skill:revise <n> <change>` | Re-reads slide *n* from disk, edits it, re-verifies it | Browser edits and agent edits touch the same files. Re-reading first means your manual fixes are never overwritten. The preview's *Regenerate* button copies this command for you |
+| `/dax-ppt-skill:check [n]` | Renders and **looks at** every slide, then audits it against the brand rules | Catches what reviewers catch: overflow, dead space, topic-label titles, off-brand colours, and text inside SVG, which would turn into an uneditable picture |
+| `/dax-ppt-skill:preview [title]` | Builds and serves the live editable preview | Lets you edit text, chart data, notes and slide order in the browser, and saves those edits to the slide files |
+| `/dax-ppt-skill:notes [n] [style]` | Writes speaker notes for every slide | Notes go into PowerPoint's real notes field, so the deck is ready to present, not just to read |
+| `/dax-ppt-skill:export [title]` | Exports the `.pptx` and **checks** the native chart, table and notes counts | Proves the output is editable: a missing chart count means something exported as a flat picture, and the command fixes it before you ship |
+| `/dax-ppt-skill:setup` | Installs dependencies and runs `dax.py doctor` | Turns "export failed" into a named, fixable problem before you start |
+
+A typical session:
+
+```
+/dax-ppt-skill:setup
+/dax-ppt-skill:from-data q3_sales.csv  board update on regional performance
+/dax-ppt-skill:outline                  (approve or edit the titles)
+/dax-ppt-skill:new                      (build, verify, open preview)
+/dax-ppt-skill:revise 4 lead with the churn number, drop the table
+/dax-ppt-skill:check
+/dax-ppt-skill:notes
+/dax-ppt-skill:export
+```
+
 ### Driving the CLI directly
 
 ```bash
@@ -98,6 +131,8 @@ Every command prints one JSON object and exits non-zero on error.
 ## Layout
 
 ```
+commands/                     slash commands: new, outline, from-data, revise,
+                              check, preview, notes, export, setup
 skills/dax-ppt/
 ├── SKILL.md                  the workflow the agent follows
 ├── scripts/

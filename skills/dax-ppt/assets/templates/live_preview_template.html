@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Auto-refresh is handled in JS so in-page edits are never wiped -->
-    <title>{{topic}} - Live Preview</title>
+    <title>{{topic}} - DAX-PPT Maker</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -2080,7 +2080,7 @@
                         <rect x="14" y="7" width="4" height="5" rx="0.5" fill="rgba(255,255,255,0.2)"/>
                     </svg>
                 </div>
-                <div class="brand-text">GAIA-AGENT <span>/ Presentation Maker</span></div>
+                <div class="brand-text">DAX-PPT MAKER <span>/ Data Axle</span></div>
             </div>
 
             <div class="navbar-actions">
@@ -3006,7 +3006,7 @@
             const slideNumber = currentSlideIndex + 1;
 
             // Create a formatted instruction message for the user to copy
-            const regenerateCommand = `Please regenerate slide ${slideNumber} with the following instructions:\n\n"${instructions}"`;
+            const regenerateCommand = `/dax-ppt-skill:revise ${slideNumber} ${instructions}`;
 
             // Copy to clipboard
             try {
@@ -3038,9 +3038,9 @@
                         <h3>Regenerate Slide ${slideNumber}</h3>
                     </div>
                     <div class="regenerate-instructions-body">
-                        <p>To regenerate this slide, go back to the PPT Agent and use the following command:</p>
+                        <p>To regenerate this slide, paste this command into your coding agent (in agents without slash commands, just ask it to revise the slide):</p>
                         <div class="regenerate-command-box">
-                            <code>Regenerate slide ${slideNumber}: "${instructions}"</code>
+                            <code>/dax-ppt-skill:revise ${slideNumber} ${instructions}</code>
                             <button class="copy-command-btn" title="Copy to clipboard">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
@@ -3081,7 +3081,7 @@
             // Copy button handler
             const copyBtn = modal.querySelector('.copy-command-btn');
             copyBtn.addEventListener('click', async () => {
-                const command = `Regenerate slide ${slideNumber}: "${instructions}"`;
+                const command = `/dax-ppt-skill:revise ${slideNumber} ${instructions}`;
                 try {
                     await navigator.clipboard.writeText(command);
                     copyBtn.innerHTML = `
