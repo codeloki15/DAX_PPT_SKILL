@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "dax-ppt",
+  "description": "Data Axle presentation tooling for coding agents.",
+  "owner": {
+    "name": "Data Axle"
+  },
+  "plugins": [
+    {
+      "name": "dax-ppt-skill",
+      "description": "Build consulting-grade Data Axle presentations: HTML slides in the house style, native editable PowerPoint charts and tables, live browser preview with editing, and PPTX export",
+      "version": "1.0.0",
+      "source": "./",
+      "category": "productivity",
+      "author": {
+        "name": "Data Axle"
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "name": "dax-ppt-skill",
+  "displayName": "Data Axle PPT Skill",
+  "version": "1.0.0",
+  "description": "Data Axle presentation skill for Muse: consulting-grade decks with native editable PowerPoint charts and tables",
+  "compat": {
+    "source": "native",
+    "manifestDir": ".muse-plugin"
+  },
+  "capabilities": {
+    "skills": [
+      {
+        "id": "dax-ppt",
+        "path": "skills/dax-ppt/SKILL.md"
+      }
+    ],
+    "commands": [],
+    "hooks": [],
+    "mcpServers": [],
+    "reminders": []
+  }
+}

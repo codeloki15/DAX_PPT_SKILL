@@ -1,0 +1,34 @@
+{
+  "name": "dax-ppt-skill",
+  "version": "1.0.0",
+  "description": "Build consulting-grade Data Axle presentations with native editable PowerPoint charts, exhibits, live preview and PPTX export.",
+  "author": {
+    "name": "Data Axle"
+  },
+  "homepage": "https://github.com/data-axle/dax-ppt-skill",
+  "license": "MIT",
+  "keywords": [
+    "powerpoint",
+    "pptx",
+    "presentations",
+    "slides",
+    "charts",
+    "exhibits",
+    "data-axle",
+    "consulting-deck"
+  ],
+  "skills": "./skills/",
+  "skillInstructions": "Kimi Code tool mapping for the DAX PPT skill:\n\n- The skill's Python scripts are run with Kimi Code's `Bash` tool. Always pass an explicit `--workspace` so concurrent decks do not overwrite each other.\n- When the skill says to read a rendered screenshot, use Kimi Code's `Read` tool on the returned PNG path so you can actually SEE the slide before judging layout.\n- When the skill says to write or rewrite a slide, use `Write` for a whole slide file and `Edit` for a targeted change. Slide files are shared state with the browser editor: re-read with `Read` before editing a slide the user may have touched.\n- When the skill says to ask the user for deck parameters (topic, audience, slide count, data file), call `AskUserQuestion` with 2-4 concrete options rather than plain assistant text.\n- When the skill refers to a todo list for tracking slide-by-slide progress, use Kimi Code's `TodoList` tool.\n- When the skill suggests building several independent slides at once, use the `Agent` tool with a Kimi subagent type; keep verification and export sequential.\n- Use `Grep` to search slide contents, `Glob` to find slide files by pattern.",
+  "interface": {
+    "displayName": "Data Axle PPT Skill",
+    "shortDescription": "Consulting-grade Data Axle decks with native editable PowerPoint charts",
+    "longDescription": "Builds presentations in the Data Axle house style: action-title slides, brand-locked palette and typography, charts and exhibits generated from real data, screenshot verification, and PPTX export with editable text and native charts.",
+    "developerName": "Data Axle",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/data-axle/dax-ppt-skill"
+  }
+}

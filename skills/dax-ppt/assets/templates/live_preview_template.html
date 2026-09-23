@@ -1,0 +1,3714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Auto-refresh is handled in JS so in-page edits are never wiped -->
+    <title>{{topic}} - Live Preview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --slide-width: 1280px;
+            --slide-height: 720px;
+            --scale-factor: 0.65;
+
+            /* Modern beige color palette */
+            --bg-primary: #f5f0e8;
+            --bg-secondary: #ebe5db;
+            --bg-tertiary: #e0d9cd;
+            --bg-elevated: rgba(235, 229, 219, 0.9);
+
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --text-muted: #7a7a7a;
+
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #6366f1;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+
+            --success: #22c55e;
+            --error: #ef4444;
+
+            --border-subtle: rgba(0, 0, 0, 0.06);
+            --border-default: rgba(0, 0, 0, 0.1);
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Subtle animated gradient background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139, 92, 246, 0.08), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 50%, rgba(99, 102, 241, 0.05), transparent),
+                radial-gradient(ellipse 60% 40% at 0% 80%, rgba(139, 92, 246, 0.04), transparent);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: rgba(245, 240, 232, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border-subtle);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+        }
+
+        .navbar-content {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: var(--radius-sm);
+            padding: 7px;
+        }
+
+        .brand-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: white;
+        }
+
+        .brand-text {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        .brand-text span {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .navbar-actions {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .live-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        /* Main Content */
+        .main {
+            padding-top: 104px;
+            padding-bottom: 120px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero-badge {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .hero-badge svg {
+            stroke: var(--accent-primary);
+        }
+
+        .hero h1 {
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .stat-content {
+            text-align: left;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Slides Grid */
+        .slides-section {
+            margin-top: 20px;
+        }
+
+        .slides-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .slides-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .view-toggle {
+            display: flex;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            padding: 4px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .view-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn.active {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .view-btn:hover:not(.active) {
+            color: var(--text-secondary);
+        }
+
+        /* Slide Cards */
+        .slides-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .slide-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .slide-card:hover {
+            border-color: var(--border-default);
+            box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .slide-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--bg-tertiary);
+        }
+
+        .slide-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slide-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .slide-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .slide-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .slide-filename {
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+        }
+
+        .slide-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .slide-action-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .slide-action-btn:hover {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-color: var(--accent-primary);
+        }
+
+        /* Slide Viewport */
+        .slide-viewport {
+            padding: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background:
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-position: center;
+            background-color: var(--bg-tertiary);
+        }
+
+        .slide-frame {
+            width: calc(var(--slide-width) * var(--scale-factor));
+            height: calc(var(--slide-height) * var(--scale-factor));
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow:
+                0 0 0 1px var(--border-default),
+                0 25px 80px -20px rgba(0, 0, 0, 0.15),
+                0 0 60px -30px var(--accent-glow);
+        }
+
+        .slide-content {
+            width: var(--slide-width);
+            height: var(--slide-height);
+            transform: scale(var(--scale-factor));
+            transform-origin: top left;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            background: white;
+        }
+
+        /* Export Dropdown */
+        .export-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .export-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 200% 200%;
+            border: none;
+            border-radius: 100px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+            overflow: hidden;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .export-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: left 0.5s ease;
+        }
+
+        .export-btn:hover::before {
+            left: 100%;
+        }
+
+        .export-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .export-btn:active:not(:disabled) {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .export-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            animation: none;
+        }
+
+        .export-btn svg {
+            width: 14px;
+            height: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .export-btn:hover:not(:disabled) svg {
+            animation: bounce 0.5s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(2px); }
+        }
+
+        .export-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .export-btn .chevron {
+            width: 12px;
+            height: 12px;
+            margin-left: 4px;
+            transition: transform 0.2s ease;
+        }
+
+        .export-dropdown.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .export-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1001;
+            overflow: hidden;
+        }
+
+        .export-dropdown.open .export-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .export-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .export-menu-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .export-menu-item:first-child {
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .export-menu-item svg {
+            width: 18px;
+            height: 18px;
+            color: var(--text-muted);
+        }
+
+        .export-menu-item:hover svg {
+            color: var(--accent-primary);
+        }
+
+        .export-menu-item .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .export-menu-item .item-label {
+            font-weight: 600;
+        }
+
+        .export-menu-item .item-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* Progress Modal */
+        .progress-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(245, 240, 232, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .progress-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .progress-modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            min-width: 380px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .progress-overlay.visible .progress-modal {
+            transform: scale(1);
+        }
+
+        .progress-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 24px;
+            position: relative;
+        }
+
+        .progress-spinner {
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--border-default);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .progress-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .progress-bar-container {
+            background: var(--border-default);
+            border-radius: 100px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 100px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-percent {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 12px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 10001;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            border-color: var(--success);
+        }
+
+        .toast.success .toast-icon {
+            color: var(--success);
+        }
+
+        .toast.error {
+            border-color: var(--error);
+        }
+
+        .toast.error .toast-icon {
+            color: var(--error);
+        }
+
+        .toast-icon {
+            font-size: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1000px) {
+            :root {
+                --scale-factor: 0.5;
+            }
+
+            .navbar-center {
+                display: none;
+            }
+        }
+
+        @media (max-width: 700px) {
+            :root {
+                --scale-factor: 0.38;
+            }
+
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .hero h1 {
+                font-size: 24px;
+            }
+
+            .stats-bar {
+                gap: 16px;
+            }
+
+            .slide-viewport {
+                padding: 20px;
+            }
+
+            .export-fab {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .export-btn {
+                padding: 14px 20px;
+                font-size: 14px;
+            }
+        }
+
+        /* Slide internal styles */
+        .slide-content .col {
+            display: flex;
+            flex-direction: column;
+        }
+        .slide-content .row {
+            display: flex;
+            flex-direction: row;
+        }
+        .slide-content .center {
+            justify-content: center;
+            align-items: center;
+        }
+        .slide-content .fill-height {
+            flex: 1;
+        }
+        .slide-content .fill-width {
+            flex: 1;
+        }
+        .slide-content .fit {
+            flex: none;
+        }
+        .slide-content .gap-sm { gap: 0.5rem; }
+        .slide-content .gap { gap: 1rem; }
+        .slide-content .gap-lg { gap: 2rem; }
+        .slide-content .p-4 { padding: 1rem; }
+        .slide-content .p-6 { padding: 1.5rem; }
+        .slide-content .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .slide-content .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .slide-content .rounded { border-radius: 0.4rem; }
+        .slide-content .text-center { text-align: center; }
+        .slide-content .text-left { text-align: left; }
+        .slide-content .items-center { align-items: center; }
+        .slide-content .justify-center { justify-content: center; }
+        .slide-content .text-xs { font-size: 0.75rem; }
+        .slide-content .text-sm { font-size: 0.875rem; }
+        .slide-content .text-base { font-size: 1rem; }
+        .slide-content .text-lg { font-size: 1.125rem; }
+        .slide-content .text-xl { font-size: 1.25rem; }
+        .slide-content .text-2xl { font-size: 1.5rem; }
+        .slide-content .text-3xl { font-size: 1.875rem; }
+        .slide-content .text-4xl { font-size: 2.25rem; }
+        .slide-content .text-5xl { font-size: 3rem; }
+        .slide-content .bold { font-weight: bold; }
+        .slide-content .opacity-70 { opacity: 0.7; }
+        .slide-content .opacity-50 { opacity: 0.5; }
+
+        /* ========================================
+           Floating Edit Bar Styles
+           ======================================== */
+        .edit-bar {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: 100px;
+            padding: 8px 16px;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.12),
+                0 2px 8px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .edit-bar-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-bar-section {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .edit-bar-divider {
+            width: 1px;
+            height: 28px;
+            background: var(--border-default);
+            margin: 0 8px;
+        }
+
+        .edit-bar-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 100px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .edit-bar-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .edit-bar-btn:active {
+            transform: scale(0.96);
+        }
+
+        .edit-bar-btn.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .edit-bar-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+        }
+
+        .edit-bar-btn svg {
+            flex-shrink: 0;
+        }
+
+        .nav-btn {
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .slide-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .slide-separator {
+            color: var(--text-muted);
+        }
+
+        /* Edit mode indicator on slides */
+        .slide-card.selected {
+            border-color: var(--accent-primary);
+            box-shadow:
+                0 0 0 2px var(--accent-primary),
+                0 20px 60px -20px rgba(139, 92, 246, 0.3);
+        }
+
+        .slide-card.editing .slide-content {
+            cursor: text;
+        }
+
+        .slide-card.editing .slide-content [contenteditable="true"] {
+            outline: 2px dashed var(--accent-primary);
+            outline-offset: 2px;
+            border-radius: 4px;
+            min-height: 1em;
+        }
+
+        .slide-card.editing .slide-content [contenteditable="true"]:focus {
+            outline: 2px solid var(--accent-primary);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        /* ========================================
+           Regenerate Overlay Styles
+           ======================================== */
+        .regenerate-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .regenerate-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .regenerate-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-xl);
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .regenerate-overlay.visible .regenerate-panel {
+            transform: translateY(0) scale(1);
+        }
+
+        .regenerate-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--bg-tertiary);
+        }
+
+        .regenerate-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .regenerate-close {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .regenerate-close:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .regenerate-body {
+            padding: 24px;
+        }
+
+        .regenerate-body label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .regenerate-body textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 14px 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--text-primary);
+            resize: vertical;
+            transition: all 0.2s ease;
+        }
+
+        .regenerate-body textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .regenerate-body textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .regenerate-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-tertiary);
+        }
+
+        .regenerate-cancel {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid var(--border-default);
+            border-radius: 100px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .regenerate-cancel:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .regenerate-submit {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            border-radius: 100px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .regenerate-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .regenerate-submit:active {
+            transform: translateY(0);
+        }
+
+        .regenerate-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Regenerate Instructions Modal */
+        .regenerate-instructions-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .regenerate-instructions-modal.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .regenerate-instructions-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-xl);
+            width: 90%;
+            max-width: 520px;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .regenerate-instructions-modal.visible .regenerate-instructions-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .regenerate-instructions-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--bg-tertiary);
+        }
+
+        .regenerate-instructions-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: var(--radius-md);
+            color: white;
+        }
+
+        .regenerate-instructions-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .regenerate-instructions-body {
+            padding: 24px;
+        }
+
+        .regenerate-instructions-body p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0 0 16px 0;
+            line-height: 1.5;
+        }
+
+        .regenerate-command-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+        }
+
+        .regenerate-command-box code {
+            flex: 1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--text-primary);
+            word-break: break-word;
+            line-height: 1.5;
+        }
+
+        .copy-command-btn {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-command-btn:hover {
+            background: var(--bg-secondary);
+            color: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .copied-notice {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px !important;
+            color: var(--success) !important;
+            margin-bottom: 12px !important;
+        }
+
+        .hint-text {
+            font-size: 13px !important;
+            color: var(--text-muted) !important;
+            margin-bottom: 0 !important;
+        }
+
+        .regenerate-instructions-footer {
+            display: flex;
+            justify-content: flex-end;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-tertiary);
+        }
+
+        .regenerate-instructions-close {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            border-radius: 100px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .regenerate-instructions-close:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        /* Adjust main content padding to account for edit bar */
+        .main {
+            padding-bottom: 140px;
+        }
+
+        /* The toolbar carries 13 actions now - drop the text labels well before
+           they would overflow, keeping icons + tooltips (PowerPoint does the
+           same as its ribbon narrows). */
+        @media (max-width: 1500px) {
+            .edit-bar-btn.action-btn span:not(.save-status) { display: none; }
+            .edit-bar-btn.action-btn { padding: 10px; }
+            .save-status { margin-left: 6px; font-size: 11px; }
+        }
+
+        @media (max-width: 1080px) {
+            .edit-bar-divider { display: none; }
+            .edit-bar-section { gap: 2px; }
+            .save-status { display: none; }
+        }
+
+        /* Responsive edit bar */
+        @media (max-width: 768px) {
+            .edit-bar {
+                bottom: 16px;
+                left: 16px;
+                right: 16px;
+                transform: none;
+                border-radius: var(--radius-lg);
+                padding: 8px 12px;
+            }
+
+            .edit-bar-content {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .edit-bar-btn span {
+                display: none;
+            }
+
+            .edit-bar-btn {
+                padding: 10px;
+            }
+
+            .edit-bar-divider {
+                display: none;
+            }
+
+            .edit-bar-section {
+                gap: 2px;
+            }
+        }
+
+        /* ========================================
+           PowerPoint-style additions
+           ======================================== */
+
+        /* High zoom levels: scroll instead of clipping the slide's left edge */
+        .slide-viewport {
+            overflow-x: auto;
+            justify-content: safe center;
+        }
+
+        /* Navbar tool buttons */
+        .nav-tool-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-tool-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .nav-tool-btn.active {
+            color: var(--accent-primary);
+            border-color: var(--accent-primary);
+            background: rgba(139, 92, 246, 0.08);
+        }
+
+        .zoom-control {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .zoom-label {
+            min-width: 48px;
+            height: 36px;
+            padding: 0 6px;
+            background: none;
+            border: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .zoom-label:hover { color: var(--accent-primary); }
+
+        .present-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 36px;
+            padding: 0 16px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            border-radius: var(--radius-sm);
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .present-btn:hover { filter: brightness(1.1); box-shadow: 0 4px 16px var(--accent-glow); }
+
+        /* Thumbnail sidebar (film strip) */
+        .thumb-rail {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            bottom: 0;
+            width: 208px;
+            padding: 16px 12px 100px;
+            overflow-y: auto;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-subtle);
+            z-index: 900;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        body.has-sidebar .thumb-rail { display: flex; }
+
+        @media (min-width: 1200px) {
+            body.has-sidebar .main { margin-left: 208px; }
+        }
+
+        .thumb {
+            position: relative;
+            display: block;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            padding: 0;
+            border: 2px solid var(--border-default);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.15s ease, transform 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .thumb:hover { transform: translateY(-1px); border-color: var(--text-muted); }
+        .thumb.selected { border-color: var(--accent-primary); box-shadow: 0 0 0 2px var(--accent-glow); }
+
+        .thumb img, .thumb canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .thumb .thumb-num {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            min-width: 20px;
+            padding: 1px 6px;
+            background: rgba(26, 26, 26, 0.75);
+            border-radius: 6px;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .thumb .thumb-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+        }
+
+        /* Selected slide card */
+        .slide-card.selected {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px var(--accent-glow), 0 20px 60px -20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Speaker notes */
+        .notes-wrap {
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-secondary);
+        }
+
+        .notes-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 10px 24px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .notes-toggle:hover { color: var(--text-primary); }
+        .notes-toggle .notes-chevron { transition: transform 0.2s ease; }
+        .notes-wrap.open .notes-chevron { transform: rotate(90deg); }
+        .notes-toggle .notes-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--accent-primary); display: none;
+        }
+        .notes-wrap.has-notes .notes-dot { display: block; }
+
+        .notes-body { display: none; padding: 0 24px 16px; }
+        .notes-wrap.open .notes-body { display: block; }
+
+        .notes-input {
+            width: 100%;
+            min-height: 72px;
+            padding: 10px 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-primary);
+            resize: vertical;
+        }
+
+        .notes-input:focus { outline: none; border-color: var(--accent-primary); }
+
+        /* Present (slideshow) mode */
+        .present-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 5000;
+            display: none;
+        }
+
+        .present-overlay.visible { display: block; }
+        .present-overlay.hide-cursor { cursor: none; }
+
+        .present-stage {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+
+        .present-overlay.blackout .present-stage { visibility: hidden; }
+
+        .present-hud {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 22px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            z-index: 2;
+        }
+
+        .present-overlay.show-hud .present-hud { opacity: 1; }
+
+        .present-hud-group { display: flex; align-items: center; gap: 10px; }
+
+        .present-hud button {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .present-hud button:hover { background: rgba(255, 255, 255, 0.25); }
+
+        .present-counter, .present-timer {
+            color: rgba(255, 255, 255, 0.85);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+
+        .present-notes {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 70px;
+            max-width: 720px;
+            width: calc(100% - 80px);
+            max-height: 30vh;
+            overflow-y: auto;
+            padding: 14px 20px;
+            background: rgba(20, 20, 20, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-md);
+            color: rgba(255, 255, 255, 0.92);
+            font-size: 15px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            display: none;
+            z-index: 3;
+        }
+
+        .present-overlay.show-notes .present-notes { display: block; }
+
+        /* Shortcuts overlay */
+        .shortcuts-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 4000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shortcuts-overlay.visible { display: flex; }
+
+        .shortcuts-panel {
+            width: min(560px, calc(100% - 40px));
+            max-height: 80vh;
+            overflow-y: auto;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: 28px 32px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+        }
+
+        .shortcuts-panel h3 { font-size: 18px; margin-bottom: 18px; }
+
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 8px 18px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .shortcuts-grid kbd {
+            display: inline-block;
+            min-width: 24px;
+            padding: 2px 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-bottom-width: 2px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .shortcuts-section {
+            grid-column: 1 / -1;
+            margin-top: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 1100px) {
+            .zoom-control, #print-btn, #help-btn { display: none; }
+        }
+
+        /* ---------- Editing UI ---------- */
+
+        .save-status {
+            margin-left: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        .save-status[data-tone="ok"] { color: var(--success); }
+        .save-status[data-tone="warn"] { color: #b07a16; }
+        .save-status[data-tone="error"] { color: var(--error); }
+
+        .slide-card.has-unsaved .slide-card-header {
+            box-shadow: inset 3px 0 0 #b07a16;
+        }
+
+        .overflow-badge {
+            margin-left: 10px;
+            padding: 3px 9px;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid var(--error);
+            border-radius: 100px;
+            color: var(--error);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: help;
+        }
+
+        body.no-edit-server #save-btn,
+        body.no-edit-server #add-slide-btn { opacity: 0.45; }
+
+        /* Floating rich-text toolbar */
+        .format-bar {
+            position: fixed;
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            gap: 2px;
+            padding: 5px 7px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+        }
+
+        .format-bar.visible { display: flex; }
+
+        .format-bar button {
+            min-width: 30px;
+            height: 30px;
+            padding: 0 7px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .format-bar button:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .format-bar .format-sep { width: 1px; height: 20px; background: var(--border-default); margin: 0 3px; }
+        .format-bar .swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.15); display: block; }
+
+        /* Chart "Edit data" affordance */
+        .chart-edit-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            z-index: 5;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .slide-card:hover .chart-edit-btn { opacity: 1; }
+        .chart-edit-btn:hover { color: var(--accent-primary); border-color: var(--accent-primary); }
+
+        /* Chart data editor */
+        .chart-editor-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 4500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .chart-editor-overlay.visible { display: flex; }
+
+        .chart-editor-panel {
+            width: min(720px, calc(100% - 40px));
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+        }
+
+        .chart-editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .chart-editor-header h3 { font-size: 16px; }
+        .chart-editor-close {
+            background: none; border: none; cursor: pointer;
+            color: var(--text-muted); font-size: 15px;
+        }
+
+        .chart-editor-body { padding: 18px 22px; overflow-y: auto; }
+        .chart-editor-field {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; font-weight: 600; color: var(--text-secondary);
+            margin-bottom: 14px;
+        }
+        .chart-editor-field select {
+            padding: 6px 10px; font-family: inherit; font-size: 13px;
+            border: 1px solid var(--border-default); border-radius: var(--radius-sm);
+            background: var(--bg-secondary); color: var(--text-primary);
+        }
+
+        .chart-table-wrap { overflow-x: auto; }
+        .chart-table { width: 100%; border-collapse: collapse; }
+        .chart-table th, .chart-table td { padding: 4px; }
+        .chart-table th { text-align: left; }
+        .chart-table input {
+            width: 100%; min-width: 92px; padding: 7px 9px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-sm);
+            font-family: inherit; font-size: 13px; color: var(--text-primary);
+        }
+        .chart-table input:focus { outline: none; border-color: var(--accent-primary); }
+        .chart-table .chart-series-name { font-weight: 600; }
+
+        .chart-editor-hint { margin-top: 14px; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+        .chart-editor-footer {
+            display: flex; justify-content: flex-end; gap: 10px;
+            padding: 16px 22px; border-top: 1px solid var(--border-subtle);
+        }
+        .chart-editor-footer button {
+            padding: 9px 18px; border-radius: var(--radius-sm);
+            font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+        }
+        .chart-editor-cancel { background: var(--bg-secondary); border: 1px solid var(--border-default); color: var(--text-secondary); }
+        .chart-editor-save {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none; color: white;
+        }
+
+        /* ---------- Context menu ---------- */
+        .ctx-menu {
+            position: fixed;
+            z-index: 4800;
+            display: none;
+            min-width: 232px;
+            padding: 6px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            box-shadow: 0 18px 46px rgba(0, 0, 0, 0.24);
+        }
+        .ctx-menu.visible { display: block; }
+        .ctx-menu button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            width: 100%;
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--text-primary);
+            text-align: left;
+            cursor: pointer;
+        }
+        .ctx-menu button span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .ctx-menu button:hover:not(:disabled) { background: var(--bg-tertiary); }
+        .ctx-menu button:disabled { opacity: 0.4; cursor: default; }
+        .ctx-menu button.danger { color: var(--error); }
+        .ctx-sep { height: 1px; margin: 5px 8px; background: var(--border-subtle); }
+
+        /* ---------- Thumbnail drag-reorder ---------- */
+        .thumb { cursor: grab; }
+        .thumb.dragging { opacity: 0.4; cursor: grabbing; }
+        .thumb.drop-before { box-shadow: 0 -3px 0 0 var(--accent-primary); }
+        .thumb.drop-after { box-shadow: 0 3px 0 0 var(--accent-primary); }
+
+        /* ---------- Layout gallery / history ---------- */
+        .layout-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 4600;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .layout-overlay.visible { display: flex; }
+
+        .layout-panel {
+            width: min(680px, calc(100% - 40px));
+            max-height: 84vh;
+            overflow-y: auto;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+        }
+
+        .layout-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .layout-header h3 { font-size: 16px; }
+        .layout-close { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 15px; }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 14px;
+            padding: 20px 22px 24px;
+        }
+
+        .layout-card {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            padding: 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .layout-thumb {
+            display: block;
+            aspect-ratio: 16 / 9;
+            background: #fff;
+            border: 1.5px solid var(--border-default);
+            border-radius: var(--radius-sm);
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.15s ease, transform 0.15s ease;
+        }
+        .layout-card:hover .layout-thumb { border-color: var(--accent-primary); transform: translateY(-2px); }
+
+        /* Miniature previews drawn with gradients - no assets needed */
+        .layout-thumb::before, .layout-thumb::after { content: ''; position: absolute; }
+        .layout-thumb-title_slide::before { left: 14%; right: 14%; top: 38%; height: 12%; background: #12263F; }
+        .layout-thumb-title_slide::after { left: 14%; right: 40%; top: 58%; height: 6%; background: #D4D9E0; }
+        .layout-thumb-title_content::before { left: 10%; right: 30%; top: 14%; height: 9%; background: #12263F; }
+        .layout-thumb-title_content::after { left: 10%; right: 10%; top: 34%; bottom: 16%; background: #F4F6F8; border: 1px solid #D4D9E0; }
+        .layout-thumb-two_content::before { left: 10%; width: 37%; top: 34%; bottom: 16%; background: #F4F6F8; border: 1px solid #D4D9E0; }
+        .layout-thumb-two_content::after { right: 10%; width: 37%; top: 34%; bottom: 16%; background: #F4F6F8; border: 1px solid #D4D9E0; }
+        .layout-thumb-table::before { left: 10%; right: 10%; top: 32%; height: 8%; background: #12263F; }
+        .layout-thumb-table::after { left: 10%; right: 10%; top: 44%; bottom: 16%; background: repeating-linear-gradient(#fff 0 6px, #E8ECF1 6px 7px); border: 1px solid #D4D9E0; }
+        .layout-thumb-section_break::before { left: 16%; right: 16%; top: 44%; height: 13%; background: #12263F; }
+        .layout-thumb-section_break::after { left: 16%; width: 16%; top: 63%; height: 5%; background: #00A0DC; }
+
+        .layout-name { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); text-align: left; }
+
+        .history-list { padding: 16px 22px 22px; }
+        .history-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 11px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .history-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .history-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+        .history-restore {
+            padding: 6px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .history-restore:hover { color: var(--accent-primary); border-color: var(--accent-primary); }
+
+        /* Print: one slide per landscape page at exact 16:9 */
+        @media print {
+            @page { size: 13.333in 7.5in; margin: 0; }
+
+            .navbar, .thumb-rail, .edit-bar, .hero, .hero-badge, .slides-header,
+            .slide-card-header, .notes-wrap, .toast, .progress-overlay,
+            .regenerate-overlay, .shortcuts-overlay, .present-overlay,
+            .format-bar, .chart-edit-btn, .chart-editor-overlay,
+            .ctx-menu, .layout-overlay { display: none !important; }
+
+            body::before { display: none; }
+            body { background: white; }
+            body.has-sidebar .main { margin-left: 0; }
+            .main { padding: 0; min-height: 0; }
+            .container { max-width: none; padding: 0; margin: 0; }
+            .slides-container { display: block; }
+
+            .slide-card {
+                border: none;
+                border-radius: 0;
+                box-shadow: none;
+                background: none;
+                page-break-after: always;
+                break-after: page;
+            }
+
+            .slide-card:hover { transform: none; box-shadow: none; }
+            .slide-viewport { padding: 0; background: none; }
+
+            .slide-frame {
+                width: 1280px;
+                height: 720px;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .slide-content { transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="navbar-brand">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" fill="rgba(255,255,255,0.1)"/>
+                        <path d="M8 21h8"/>
+                        <path d="M12 17v4"/>
+                        <path d="M7 8h4"/>
+                        <path d="M7 11h6"/>
+                        <rect x="14" y="7" width="4" height="5" rx="0.5" fill="rgba(255,255,255,0.2)"/>
+                    </svg>
+                </div>
+                <div class="brand-text">GAIA-AGENT <span>/ Presentation Maker</span></div>
+            </div>
+
+            <div class="navbar-actions">
+                <div class="status-badge">
+                    <span class="live-indicator"></span>
+                    Live
+                </div>
+                <button class="nav-tool-btn" id="sidebar-toggle" title="Toggle slide panel (T)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <line x1="9" y1="3" x2="9" y2="21"/>
+                    </svg>
+                </button>
+                <div class="zoom-control">
+                    <button class="nav-tool-btn" id="zoom-out" title="Zoom out (-)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <button class="zoom-label" id="zoom-label" title="Click to reset zoom">65%</button>
+                    <button class="nav-tool-btn" id="zoom-in" title="Zoom in (+)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                </div>
+                <button class="nav-tool-btn" id="print-btn" title="Print (Ctrl/Cmd+P)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"/>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                        <rect x="6" y="14" width="12" height="8"/>
+                    </svg>
+                </button>
+                <button class="nav-tool-btn" id="help-btn" title="Keyboard shortcuts (?)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </button>
+                <button class="present-btn" id="present-btn" title="Present from beginning (F5). Shift+click: from current slide">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                        <polygon points="6 4 20 12 6 20"/>
+                    </svg>
+                    <span>Present</span>
+                </button>
+                <div class="export-dropdown" id="export-dropdown">
+                    <button id="export-btn" class="export-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        <span id="export-text">Export</span>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </button>
+                    <div class="export-menu">
+                        <button class="export-menu-item" id="export-pptx">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                                <path d="M8 21h8"/>
+                                <path d="M12 17v4"/>
+                            </svg>
+                            <div class="item-info">
+                                <span class="item-label">PowerPoint (.pptx)</span>
+                                <span class="item-desc">Editable presentation</span>
+                            </div>
+                        </button>
+                        <button class="export-menu-item" id="export-pdf">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10 9 9 9 8 9"/>
+                            </svg>
+                            <div class="item-info">
+                                <span class="item-label">PDF (.pdf)</span>
+                                <span class="item-desc">Print-ready document</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Thumbnail sidebar (film strip) -->
+    <aside class="thumb-rail" id="thumb-rail"></aside>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="hero-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span id="refresh-status">Auto-refreshes every 60s</span>
+                </div>
+                <h1>{{topic}}</h1>
+                <p>Preview your presentation slides below. Export to PowerPoint when ready.</p>
+
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                                <path d="M8 21h8"/>
+                                <path d="M12 17v4"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{slide_count}}</div>
+                            <div class="stat-label">Slides</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <path d="M3 9h18"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">16:9</div>
+                            <div class="stat-label">Aspect</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v4"/>
+                                <path d="M12 18v4"/>
+                                <path d="m4.93 4.93 2.83 2.83"/>
+                                <path d="m16.24 16.24 2.83 2.83"/>
+                                <path d="M2 12h4"/>
+                                <path d="M18 12h4"/>
+                                <path d="m4.93 19.07 2.83-2.83"/>
+                                <path d="m16.24 7.76 2.83-2.83"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">HD</div>
+                            <div class="stat-label">Quality</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slides Section -->
+            <section class="slides-section">
+                <div class="slides-header">
+                    <h2 class="slides-title">All Slides</h2>
+                </div>
+
+                <div class="slides-container">
+                    {{slides_content}}
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Progress Overlay -->
+    <div class="progress-overlay" id="progress-overlay">
+        <div class="progress-modal">
+            <div class="progress-icon">
+                <div class="progress-spinner"></div>
+            </div>
+            <div class="progress-title" id="progress-title">Exporting Presentation</div>
+            <div class="progress-subtitle" id="progress-subtitle">Rendering slides...</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-percent" id="progress-percent">0%</div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toast-icon"></span>
+        <span id="toast-message"></span>
+    </div>
+
+    <!-- Floating Edit Bar -->
+    <div class="edit-bar" id="edit-bar">
+        <div class="edit-bar-content">
+            <!-- Slide Navigation -->
+            <div class="edit-bar-section slide-nav">
+                <button class="edit-bar-btn nav-btn" id="prev-slide" title="Previous Slide">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                </button>
+                <div class="slide-indicator">
+                    <span id="current-slide-num">1</span>
+                    <span class="slide-separator">/</span>
+                    <span id="total-slides-num">{{slide_count}}</span>
+                </div>
+                <button class="edit-bar-btn nav-btn" id="next-slide" title="Next Slide">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="edit-bar-divider"></div>
+
+            <!-- Edit Actions -->
+            <div class="edit-bar-section edit-actions">
+                <button class="edit-bar-btn action-btn" id="edit-text-btn" title="Edit Text">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                    <span>Edit Text</span>
+                </button>
+                <button class="edit-bar-btn action-btn" id="regenerate-btn" title="Regenerate Slide">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 2v6h-6"/>
+                        <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+                        <path d="M3 22v-6h6"/>
+                        <path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+                    </svg>
+                    <span>Regenerate</span>
+                </button>
+            </div>
+
+            <div class="edit-bar-divider"></div>
+
+            <!-- Reorder Actions -->
+            <div class="edit-bar-section reorder-actions">
+                <button class="edit-bar-btn action-btn" id="duplicate-slide-btn" title="Duplicate Slide (Ctrl/Cmd+D)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                    <span>Duplicate</span>
+                </button>
+                <button class="edit-bar-btn action-btn" id="move-up-btn" title="Move Slide Up">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="18 15 12 9 6 15"/>
+                    </svg>
+                    <span>Move Up</span>
+                </button>
+                <button class="edit-bar-btn action-btn" id="move-down-btn" title="Move Slide Down">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                    <span>Move Down</span>
+                </button>
+                <button class="edit-bar-btn action-btn danger" id="delete-slide-btn" title="Delete Slide">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        <line x1="10" y1="11" x2="10" y2="17"/>
+                        <line x1="14" y1="11" x2="14" y2="17"/>
+                    </svg>
+                    <span>Delete</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Regenerate Overlay -->
+    <div class="regenerate-overlay" id="regenerate-overlay">
+        <div class="regenerate-panel">
+            <div class="regenerate-header">
+                <h3>Regenerate Slide</h3>
+                <button class="regenerate-close" id="regenerate-close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="regenerate-body">
+                <label for="regenerate-input">Describe how you want this slide to be changed:</label>
+                <textarea id="regenerate-input" placeholder="e.g., Make the content more concise, add more bullet points, change the tone to be more professional..."></textarea>
+            </div>
+            <div class="regenerate-footer">
+                <button class="regenerate-cancel" id="regenerate-cancel">Cancel</button>
+                <button class="regenerate-submit" id="regenerate-submit">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 2v6h-6"/>
+                        <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+                    </svg>
+                    Regenerate
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Present (slideshow) mode -->
+    <div class="present-overlay" id="present-overlay">
+        <div class="present-stage" id="present-stage"></div>
+        <div class="present-notes" id="present-notes"></div>
+        <div class="present-hud">
+            <div class="present-hud-group">
+                <button id="present-prev" title="Previous (←)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <button id="present-next" title="Next (→ / Space)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+                <span class="present-counter" id="present-counter">1 / 1</span>
+            </div>
+            <div class="present-hud-group">
+                <span class="present-timer" id="present-timer">00:00</span>
+                <button id="present-notes-btn" title="Toggle notes (N)">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </button>
+                <button id="present-exit" title="End show (Esc)">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard shortcuts overlay -->
+    <div class="shortcuts-overlay" id="shortcuts-overlay">
+        <div class="shortcuts-panel">
+            <h3>Keyboard shortcuts</h3>
+            <div class="shortcuts-grid">
+                <div class="shortcuts-section">Editing</div>
+                <span><kbd>Ctrl/Cmd</kbd>+<kbd>S</kbd></span><span>Save all changes to disk</span>
+                <span><kbd>Ctrl/Cmd</kbd>+<kbd>Z</kbd></span><span>Undo</span>
+                <span><kbd>Ctrl/Cmd</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></span><span>Redo</span>
+                <span><kbd>Ctrl/Cmd</kbd>+<kbd>B</kbd> / <kbd>I</kbd> / <kbd>U</kbd></span><span>Bold / italic / underline (in edit mode)</span>
+                <div class="shortcuts-section">Slides</div>
+                <span><kbd>Ctrl/Cmd</kbd>+<kbd>M</kbd></span><span>New slide (layout gallery)</span>
+                <span><kbd>Ctrl/Cmd</kbd>+<kbd>D</kbd></span><span>Duplicate slide</span>
+                <span><kbd>Ctrl/Cmd</kbd>+<kbd>C</kbd> / <kbd>X</kbd> / <kbd>V</kbd></span><span>Copy / cut / paste slide</span>
+                <span><kbd>Right-click</kbd></span><span>Slide context menu</span>
+                <span><kbd>Drag</kbd></span><span>Reorder slides in the thumbnail panel</span>
+                <div class="shortcuts-section">Preview</div>
+                <span><kbd>←</kbd> <kbd>→</kbd></span><span>Select previous / next slide</span>
+                <span><kbd>Home</kbd> <kbd>End</kbd></span><span>First / last slide</span>
+                <span><kbd>+</kbd> <kbd>-</kbd> <kbd>0</kbd></span><span>Zoom in / out / reset</span>
+                <span><kbd>T</kbd></span><span>Toggle thumbnail panel</span>
+                <span><kbd>Ctrl/Cmd</kbd>+<kbd>D</kbd></span><span>Duplicate selected slide</span>
+                <span><kbd>Ctrl/Cmd</kbd>+<kbd>P</kbd></span><span>Print (one slide per page)</span>
+                <span><kbd>?</kbd></span><span>Show / hide this help</span>
+                <div class="shortcuts-section">Slideshow</div>
+                <span><kbd>F5</kbd> / <kbd>P</kbd></span><span>Present from beginning</span>
+                <span><kbd>Shift</kbd>+<kbd>F5</kbd></span><span>Present from current slide</span>
+                <span><kbd>→</kbd> <kbd>Space</kbd> <kbd>Click</kbd></span><span>Next slide</span>
+                <span><kbd>←</kbd> <kbd>PgUp</kbd></span><span>Previous slide</span>
+                <span><kbd>N</kbd></span><span>Toggle speaker notes</span>
+                <span><kbd>B</kbd></span><span>Black screen on / off</span>
+                <span><kbd>Esc</kbd></span><span>End slideshow</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PptxGenJS + JSZip build the NATIVE chart/table parts and merge them into
+         the deck. dom-to-pptx bundles its own PptxGenJS in a closure, so these
+         must be loaded separately (and BEFORE it) to be reachable. -->
+    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@4.0.1/dist/pptxgen.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <!-- dom-to-pptx Library (built on PptxGenJS with better layout preservation) - version PINNED -->
+    <script src="https://cdn.jsdelivr.net/npm/dom-to-pptx@2.1.1/dist/dom-to-pptx.bundle.js"></script>
+    <!-- html2canvas and jsPDF for PDF export -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <!-- Chart.js renders .chart-embed placeholders live in the preview.
+         The agent export replaces them with NATIVE PowerPoint charts;
+         the in-browser Export button rasterises them as pictures. -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+
+    <script>
+        // Served over http:// by edit_server.py means edits can persist to disk;
+        // over file:// the page is read-only. Set before any init runs.
+        window.__editorHasServer = (location.protocol === 'http:' || location.protocol === 'https:');
+
+        // Chart specs injected by create_live_preview (chart_id -> spec)
+        window.CHART_SPECS = {{chart_specs}};
+
+{{chart_renderer}}
+    </script>
+
+    <script>
+        // Dropdown toggle
+        const exportDropdown = document.getElementById('export-dropdown');
+        const exportBtn = document.getElementById('export-btn');
+
+        exportBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            exportDropdown.classList.toggle('open');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!exportDropdown.contains(e.target)) {
+                exportDropdown.classList.remove('open');
+            }
+        });
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+
+            icon.textContent = type === 'success' ? '\u2713' : '\u2717';
+            msg.textContent = message;
+            toast.className = 'toast visible ' + type;
+
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 4000);
+        }
+
+        // Progress management
+        function showProgress(title, subtitle, percent) {
+            const overlay = document.getElementById('progress-overlay');
+            const titleEl = document.getElementById('progress-title');
+            const subtitleEl = document.getElementById('progress-subtitle');
+            const fill = document.getElementById('progress-fill');
+            const percentEl = document.getElementById('progress-percent');
+
+            overlay.classList.add('visible');
+            titleEl.textContent = title;
+            subtitleEl.textContent = subtitle;
+            fill.style.width = percent + '%';
+            percentEl.textContent = Math.round(percent) + '%';
+        }
+
+        function hideProgress() {
+            const overlay = document.getElementById('progress-overlay');
+            overlay.classList.remove('visible');
+        }
+
+        // Export using dom-to-pptx library for pixel-accurate layout preservation
+        // dom-to-pptx downloads directly with no way to get the blob back, so
+        // intercept the anchor click / object URL it uses and keep the data.
+        async function captureExport(slideArray) {
+            let captured = null;
+            const origCreate = URL.createObjectURL;
+            const origClick = HTMLAnchorElement.prototype.click;
+
+            URL.createObjectURL = function (blob) {
+                if (blob instanceof Blob && !captured) captured = blob;
+                return origCreate.call(URL, blob);
+            };
+            // Swallow the library's own download click
+            HTMLAnchorElement.prototype.click = function () {
+                if (this.download) return;
+                return origClick.call(this);
+            };
+
+            try {
+                await domToPptx.exportToPptx(slideArray, {
+                    fileName: '{{topic_slug}}_presentation.pptx',
+                    width: 13.333, height: 7.5
+                });
+            } finally {
+                URL.createObjectURL = origCreate;
+                HTMLAnchorElement.prototype.click = origClick;
+            }
+            return captured;
+        }
+
+        function downloadBlob(blob, filename) {
+            if (!blob) throw new Error('Export produced no file');
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 4000);
+        }
+
+        async function exportToPptx() {
+            const exportText = document.getElementById('export-text');
+            exportDropdown.classList.remove('open');
+
+            exportBtn.disabled = true;
+            exportText.textContent = 'Exporting...';
+
+            try {
+                const slideContents = document.querySelectorAll('.slide-content');
+
+                if (slideContents.length === 0) {
+                    throw new Error('No slides found to export');
+                }
+
+                showProgress(
+                    'Exporting Presentation',
+                    'Preparing slides for export...',
+                    10
+                );
+
+                // Temporarily remove the scale transform for accurate rendering
+                const originalTransforms = [];
+                slideContents.forEach((slide, i) => {
+                    originalTransforms[i] = slide.style.transform;
+                    slide.style.transform = 'none';
+                    slide.style.position = 'relative';
+                });
+
+                showProgress(
+                    'Exporting Presentation',
+                    'Building native charts and tables...',
+                    25
+                );
+
+                // Pull charts/tables out of the DOM and rebuild them as REAL
+                // PowerPoint parts. Removing them first means dom-to-pptx has
+                // nothing chart-shaped left to flatten into a picture.
+                const slideArray = Array.from(slideContents);
+                let overlayBlob = null;
+                let nativeCount = 0;
+                if (window.NativeExport) {
+                    const extracted = window.NativeExport.extractAndStrip(slideArray);
+                    nativeCount = extracted.reduce(
+                        (n, e) => n + e.charts.length + e.tables.length, 0);
+                    if (nativeCount) {
+                        overlayBlob = await window.NativeExport.buildOverlayDeck(extracted);
+                    }
+                }
+
+                showProgress(
+                    'Exporting Presentation',
+                    'Converting slides to PowerPoint format...',
+                    50
+                );
+
+                // Capture dom-to-pptx's output instead of letting it download,
+                // so the native chart/table parts can be merged in first.
+                const baseBlob = await captureExport(slideArray);
+
+                showProgress('Exporting Presentation', 'Merging native charts...', 80);
+
+                let finalBlob = baseBlob;
+                if (overlayBlob && baseBlob) {
+                    try {
+                        finalBlob = await window.NativeExport.mergeDecks(baseBlob, overlayBlob);
+                    } catch (mergeErr) {
+                        console.error('Native chart merge failed:', mergeErr);
+                        showToast('Charts exported as images (merge failed: '
+                                  + mergeErr.message + ')', 'error');
+                    }
+                }
+
+                downloadBlob(finalBlob, '{{topic_slug}}_presentation.pptx');
+
+                // Restore original transforms
+                slideContents.forEach((slide, i) => {
+                    slide.style.transform = originalTransforms[i];
+                    slide.style.position = 'absolute';
+                });
+
+                showProgress(
+                    'Exporting Presentation',
+                    'Download complete!',
+                    100
+                );
+
+                setTimeout(() => {
+                    hideProgress();
+                    exportText.textContent = 'Exported!';
+                    showToast('Presentation exported successfully!', 'success');
+                }, 500);
+
+            } catch (error) {
+                console.error('Export failed:', error);
+                hideProgress();
+                exportText.textContent = 'Failed';
+                showToast('Export failed: ' + error.message, 'error');
+
+                // Restore transforms on error
+                const slideContents = document.querySelectorAll('.slide-content');
+                slideContents.forEach((slide) => {
+                    slide.style.transform = 'scale(var(--scale-factor))';
+                    slide.style.position = 'absolute';
+                });
+            }
+
+            setTimeout(() => {
+                exportBtn.disabled = false;
+                exportText.textContent = 'Export';
+            }, 3000);
+        }
+
+        // Export to PDF using html2canvas and jsPDF
+        async function exportToPdf() {
+            const exportText = document.getElementById('export-text');
+            exportDropdown.classList.remove('open');
+
+            exportBtn.disabled = true;
+            exportText.textContent = 'Exporting...';
+
+            try {
+                const slideContents = document.querySelectorAll('.slide-content');
+
+                if (slideContents.length === 0) {
+                    throw new Error('No slides found to export');
+                }
+
+                showProgress(
+                    'Exporting to PDF',
+                    'Preparing slides...',
+                    5
+                );
+
+                const { jsPDF } = window.jspdf;
+
+                // Create PDF with landscape orientation (16:9 aspect ratio)
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'px',
+                    format: [1280, 720]
+                });
+
+                // Temporarily remove the scale transform for accurate rendering
+                const originalTransforms = [];
+                const originalPositions = [];
+                slideContents.forEach((slide, i) => {
+                    originalTransforms[i] = slide.style.transform;
+                    originalPositions[i] = slide.style.position;
+                    slide.style.transform = 'none';
+                    slide.style.position = 'relative';
+                });
+
+                const totalSlides = slideContents.length;
+
+                for (let i = 0; i < totalSlides; i++) {
+                    const slide = slideContents[i];
+                    const progress = Math.round(((i + 1) / totalSlides) * 90) + 5;
+
+                    showProgress(
+                        'Exporting to PDF',
+                        `Rendering slide ${i + 1} of ${totalSlides}...`,
+                        progress
+                    );
+
+                    // Render slide to canvas
+                    const canvas = await html2canvas(slide, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: null,
+                        width: 1280,
+                        height: 720
+                    });
+
+                    // Add new page for slides after the first one
+                    if (i > 0) {
+                        pdf.addPage([1280, 720], 'landscape');
+                    }
+
+                    // Add canvas as image to PDF
+                    const imgData = canvas.toDataURL('image/png');
+                    pdf.addImage(imgData, 'PNG', 0, 0, 1280, 720);
+                }
+
+                // Restore original transforms
+                slideContents.forEach((slide, i) => {
+                    slide.style.transform = originalTransforms[i];
+                    slide.style.position = originalPositions[i];
+                });
+
+                showProgress(
+                    'Exporting to PDF',
+                    'Saving PDF file...',
+                    95
+                );
+
+                // Save the PDF
+                pdf.save('{{topic_slug}}_presentation.pdf');
+
+                showProgress(
+                    'Exporting to PDF',
+                    'Download complete!',
+                    100
+                );
+
+                setTimeout(() => {
+                    hideProgress();
+                    exportText.textContent = 'Exported!';
+                    showToast('PDF exported successfully!', 'success');
+                }, 500);
+
+            } catch (error) {
+                console.error('PDF Export failed:', error);
+                hideProgress();
+                exportText.textContent = 'Failed';
+                showToast('PDF export failed: ' + error.message, 'error');
+
+                // Restore transforms on error
+                const slideContents = document.querySelectorAll('.slide-content');
+                slideContents.forEach((slide) => {
+                    slide.style.transform = 'scale(var(--scale-factor))';
+                    slide.style.position = 'absolute';
+                });
+            }
+
+            setTimeout(() => {
+                exportBtn.disabled = false;
+                exportText.textContent = 'Export';
+            }, 3000);
+        }
+
+        // Attach export handlers
+        document.getElementById('export-pptx').addEventListener('click', exportToPptx);
+        document.getElementById('export-pdf').addEventListener('click', exportToPdf);
+
+        // ========================================
+        // Edit Bar Functionality
+        // ========================================
+
+        // State
+        let currentSlideIndex = 0;
+        let isEditMode = false;
+        let slideCards = [];
+
+        // Initialize slides
+        function initializeSlides() {
+            slideCards = Array.from(document.querySelectorAll('.slide-card'));
+            updateSlideCount();
+            selectSlide(0);
+        }
+
+        function updateSlideCount() {
+            document.getElementById('total-slides-num').textContent = slideCards.length;
+        }
+
+        // Slide selection
+        function selectSlide(index) {
+            if (index < 0 || index >= slideCards.length) return;
+
+            // Edit mode is deck-wide, so it stays on across slide changes.
+
+            // Update selection
+            slideCards.forEach((card, i) => {
+                card.classList.toggle('selected', i === index);
+            });
+
+            currentSlideIndex = index;
+            document.getElementById('current-slide-num').textContent = index + 1;
+            if (window.__onSlideSelected) window.__onSlideSelected(index);
+
+            // Update navigation buttons
+            document.getElementById('prev-slide').disabled = index === 0;
+            document.getElementById('next-slide').disabled = index === slideCards.length - 1;
+
+            // Update move buttons
+            document.getElementById('move-up-btn').disabled = index === 0;
+            document.getElementById('move-down-btn').disabled = index === slideCards.length - 1;
+
+            // Scroll to slide
+            slideCards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Navigation
+        document.getElementById('prev-slide').addEventListener('click', () => {
+            selectSlide(currentSlideIndex - 1);
+        });
+
+        document.getElementById('next-slide').addEventListener('click', () => {
+            selectSlide(currentSlideIndex + 1);
+        });
+
+        // Click on slide to select
+        document.addEventListener('click', (e) => {
+            const slideCard = e.target.closest('.slide-card');
+            if (slideCard) {
+                const index = slideCards.indexOf(slideCard);
+                if (index !== -1 && index !== currentSlideIndex) {
+                    selectSlide(index);
+                }
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            // Slideshow mode has its own key handling
+            if (window.__presenting) return;
+
+            // Don't navigate if typing in an input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+                return;
+            }
+
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectSlide(currentSlideIndex - 1);
+            } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectSlide(currentSlideIndex + 1);
+            } else if (e.key === 'Escape' && isEditMode) {
+                exitEditMode();
+            }
+        });
+
+        // ========================================
+        // Text Editing Functionality
+        // ========================================
+
+        const editTextBtn = document.getElementById('edit-text-btn');
+
+        function enterEditMode() {
+            if (slideCards.length === 0) return;
+
+            isEditMode = true;
+            editTextBtn.classList.add('active');
+
+            // Edit mode applies to the whole deck - restricting it to the
+            // selected card meant clicking any other slide silently did nothing.
+            slideCards.forEach(card => {
+                card.classList.add('editing');
+                const slideContent = card.querySelector('.slide-content');
+                if (!slideContent) return;
+                const editableElements = slideContent.querySelectorAll(
+                    'h1, h2, h3, h4, h5, h6, p, span, li, td, th, div:not(.row):not(.col):not(.slide-content)');
+
+                editableElements.forEach(el => {
+                    // Charts are edited through their data, not as text
+                    if (el.closest('.chart-embed')) return;
+                    // Only make leaf text nodes editable (elements with direct text content)
+                    if (el.childNodes.length === 1 && el.childNodes[0].nodeType === Node.TEXT_NODE) {
+                        el.setAttribute('contenteditable', 'true');
+                    } else if (el.childNodes.length > 0) {
+                        // Check if it has meaningful text
+                        const hasOnlyText = Array.from(el.childNodes).every(
+                            node => node.nodeType === Node.TEXT_NODE ||
+                                   (node.nodeType === Node.ELEMENT_NODE && ['BR', 'STRONG', 'EM', 'B', 'I', 'U', 'SPAN'].includes(node.tagName))
+                        );
+                        if (hasOnlyText && el.textContent.trim()) {
+                            el.setAttribute('contenteditable', 'true');
+                        }
+                    }
+                });
+            });
+
+            showToast('Edit mode enabled. Click any text to edit; Ctrl/Cmd+S saves.', 'success');
+        }
+
+        function exitEditMode() {
+            isEditMode = false;
+            editTextBtn.classList.remove('active');
+
+            slideCards.forEach(card => {
+                card.classList.remove('editing');
+                const editableElements = card.querySelectorAll('[contenteditable="true"]');
+                editableElements.forEach(el => {
+                    el.removeAttribute('contenteditable');
+                });
+            });
+        }
+
+        editTextBtn.addEventListener('click', async () => {
+            if (isEditMode) {
+                exitEditMode();
+                // Actually persist before claiming anything was saved.
+                if (window.__saveAll) {
+                    const ok = await window.__saveAll(false);
+                    showToast(ok ? 'Edit mode off. Changes saved to disk.'
+                                 : 'Edit mode off, but saving failed.', ok ? 'success' : 'error');
+                } else {
+                    showToast('Edit mode off. Changes are not saved (no edit server).', 'error');
+                }
+            } else {
+                enterEditMode();
+            }
+        });
+
+        // ========================================
+        // Regenerate Slide Functionality
+        // ========================================
+
+        const regenerateBtn = document.getElementById('regenerate-btn');
+        const regenerateOverlay = document.getElementById('regenerate-overlay');
+        const regenerateInput = document.getElementById('regenerate-input');
+        const regenerateClose = document.getElementById('regenerate-close');
+        const regenerateCancel = document.getElementById('regenerate-cancel');
+        const regenerateSubmit = document.getElementById('regenerate-submit');
+
+        function openRegenerateOverlay() {
+            if (slideCards.length === 0) {
+                showToast('No slides to regenerate', 'error');
+                return;
+            }
+            regenerateOverlay.classList.add('visible');
+            regenerateInput.value = '';
+            regenerateInput.focus();
+        }
+
+        function closeRegenerateOverlay() {
+            regenerateOverlay.classList.remove('visible');
+        }
+
+        regenerateBtn.addEventListener('click', openRegenerateOverlay);
+        regenerateClose.addEventListener('click', closeRegenerateOverlay);
+        regenerateCancel.addEventListener('click', closeRegenerateOverlay);
+
+        // Close on overlay click
+        regenerateOverlay.addEventListener('click', (e) => {
+            if (e.target === regenerateOverlay) {
+                closeRegenerateOverlay();
+            }
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && regenerateOverlay.classList.contains('visible')) {
+                closeRegenerateOverlay();
+            }
+        });
+
+        // Submit regenerate request
+        regenerateSubmit.addEventListener('click', async () => {
+            const instructions = regenerateInput.value.trim();
+            if (!instructions) {
+                showToast('Please enter regeneration instructions', 'error');
+                regenerateInput.focus();
+                return;
+            }
+
+            const slideNumber = currentSlideIndex + 1;
+
+            // Create a formatted instruction message for the user to copy
+            const regenerateCommand = `Please regenerate slide ${slideNumber} with the following instructions:\n\n"${instructions}"`;
+
+            // Copy to clipboard
+            try {
+                await navigator.clipboard.writeText(regenerateCommand);
+                closeRegenerateOverlay();
+                showRegenerateInstructions(slideNumber, instructions, true);
+            } catch (clipboardError) {
+                // Clipboard API might fail in file:// protocol
+                closeRegenerateOverlay();
+                showRegenerateInstructions(slideNumber, instructions, false);
+            }
+        });
+
+        // Show regenerate instructions modal
+        function showRegenerateInstructions(slideNumber, instructions, copiedToClipboard) {
+            // Create instruction modal
+            const modal = document.createElement('div');
+            modal.className = 'regenerate-instructions-modal';
+            modal.innerHTML = `
+                <div class="regenerate-instructions-content">
+                    <div class="regenerate-instructions-header">
+                        <div class="regenerate-instructions-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="16" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                        </div>
+                        <h3>Regenerate Slide ${slideNumber}</h3>
+                    </div>
+                    <div class="regenerate-instructions-body">
+                        <p>To regenerate this slide, go back to the PPT Agent and use the following command:</p>
+                        <div class="regenerate-command-box">
+                            <code>Regenerate slide ${slideNumber}: "${instructions}"</code>
+                            <button class="copy-command-btn" title="Copy to clipboard">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                            </button>
+                        </div>
+                        ${copiedToClipboard ? '<p class="copied-notice"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Command copied to clipboard!</p>' : ''}
+                        <p class="hint-text">The agent will regenerate the slide and the preview will auto-refresh in 60 seconds, or you can manually refresh.</p>
+                    </div>
+                    <div class="regenerate-instructions-footer">
+                        <button class="regenerate-instructions-close">Got it</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Animate in
+            requestAnimationFrame(() => {
+                modal.classList.add('visible');
+            });
+
+            // Close handlers
+            const closeBtn = modal.querySelector('.regenerate-instructions-close');
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('visible');
+                setTimeout(() => modal.remove(), 300);
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('visible');
+                    setTimeout(() => modal.remove(), 300);
+                }
+            });
+
+            // Copy button handler
+            const copyBtn = modal.querySelector('.copy-command-btn');
+            copyBtn.addEventListener('click', async () => {
+                const command = `Regenerate slide ${slideNumber}: "${instructions}"`;
+                try {
+                    await navigator.clipboard.writeText(command);
+                    copyBtn.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    `;
+                    setTimeout(() => {
+                        copyBtn.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                        `;
+                    }, 2000);
+                } catch (err) {
+                    showToast('Could not copy to clipboard', 'error');
+                }
+            });
+        }
+
+        // ========================================
+        // Reorder Slide Functionality
+        // ========================================
+
+        const moveUpBtn = document.getElementById('move-up-btn');
+        const moveDownBtn = document.getElementById('move-down-btn');
+        const deleteSlideBtn = document.getElementById('delete-slide-btn');
+
+        function moveSlide(direction) {
+            const newIndex = currentSlideIndex + direction;
+            if (newIndex < 0 || newIndex >= slideCards.length) return;
+
+            const container = document.querySelector('.slides-container');
+            const currentCard = slideCards[currentSlideIndex];
+            const targetCard = slideCards[newIndex];
+
+            // Animate the swap
+            currentCard.style.transition = 'transform 0.3s ease';
+            targetCard.style.transition = 'transform 0.3s ease';
+
+            if (direction === -1) {
+                // Moving up
+                container.insertBefore(currentCard, targetCard);
+            } else {
+                // Moving down
+                container.insertBefore(targetCard, currentCard);
+            }
+
+            // Update slide numbers in headers
+            updateSlideNumbers();
+
+            // Refresh slideCards array
+            slideCards = Array.from(document.querySelectorAll('.slide-card'));
+
+            // Select the moved slide at its new position
+            selectSlide(newIndex);
+
+            showToast(`Slide moved ${direction === -1 ? 'up' : 'down'}`, 'success');
+
+            if (window.__refreshThumbs) window.__refreshThumbs();
+
+            // Persist the new order to disk so the agent and the browser agree
+            if (window.__persistOrder && window.__currentOrder) {
+                if (!window.__beginDeckOp()) return;
+                const order = window.__currentOrder();
+                window.__persistOrder(order)
+                    .then(() => setTimeout(() => location.reload(), 400))
+                    .catch(err => {
+                        window.__endDeckOp();
+                        showToast('Could not save order: ' + err.message, 'error');
+                    });
+            } else if (window.__markDirty) {
+                window.__markDirty();
+            }
+        }
+
+        function updateSlideNumbers() {
+            document.querySelectorAll('.slide-card').forEach((card, index) => {
+                const numberEl = card.querySelector('.slide-number');
+                if (numberEl) {
+                    numberEl.textContent = index + 1;
+                }
+                const labelEl = card.querySelector('.slide-label');
+                if (labelEl) {
+                    labelEl.textContent = `Slide ${index + 1}`;
+                }
+                // Generated cards use .slide-badge for the number
+                const badgeEl = card.querySelector('.slide-badge');
+                if (badgeEl) {
+                    badgeEl.textContent = `Slide ${index + 1}`;
+                }
+            });
+        }
+
+        moveUpBtn.addEventListener('click', () => moveSlide(-1));
+        moveDownBtn.addEventListener('click', () => moveSlide(1));
+
+        // Delete slide
+        deleteSlideBtn.addEventListener('click', () => {
+            if (slideCards.length <= 1) {
+                showToast('Cannot delete the only slide', 'error');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to delete Slide ${currentSlideIndex + 1}?`)) {
+                return;
+            }
+
+            const cardToRemove = slideCards[currentSlideIndex];
+
+            // Animate removal
+            cardToRemove.style.transition = 'all 0.3s ease';
+            cardToRemove.style.opacity = '0';
+            cardToRemove.style.transform = 'scale(0.9)';
+
+            setTimeout(() => {
+                cardToRemove.remove();
+
+                // Refresh slideCards array
+                slideCards = Array.from(document.querySelectorAll('.slide-card'));
+                updateSlideNumbers();
+                updateSlideCount();
+
+                // Select appropriate slide
+                const newIndex = Math.min(currentSlideIndex, slideCards.length - 1);
+                selectSlide(newIndex);
+
+                showToast('Slide deleted', 'success');
+                if (window.__refreshThumbs) window.__refreshThumbs();
+
+                // Persist deletion: the remaining order becomes the deck
+                if (window.__persistOrder && window.__currentOrder) {
+                    if (!window.__beginDeckOp()) return;
+                    window.__persistOrder(window.__currentOrder())
+                        .then(() => setTimeout(() => location.reload(), 400))
+                        .catch(err => {
+                            window.__endDeckOp();
+                            showToast('Could not save deletion: ' + err.message, 'error');
+                        });
+                } else if (window.__markDirty) {
+                    window.__markDirty();
+                }
+            }, 300);
+        });
+
+        // ========================================
+        // Initialize
+        // ========================================
+
+        // Add spin animation for loading
+        const style = document.createElement('style');
+        style.textContent = `
+            .spin {
+                animation: spin 1s linear infinite;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize on DOM load
+        document.addEventListener('DOMContentLoaded', initializeSlides);
+
+        // Also initialize immediately if DOM is already loaded
+        if (document.readyState !== 'loading') {
+            initializeSlides();
+        }
+
+        console.log('Live preview loaded:', new Date().toLocaleTimeString());
+    </script>
+
+    <script>
+        // ========================================
+        // PowerPoint-style features:
+        // present mode, thumbnails, zoom, notes,
+        // duplicate, print, smart auto-refresh
+        // ========================================
+
+        // ---------- Smart auto-refresh ----------
+        let pageDirty = false;
+        const refreshStatus = document.getElementById('refresh-status');
+
+        window.__markDirty = function () {
+            if (pageDirty) return;
+            pageDirty = true;
+            if (refreshStatus) {
+                refreshStatus.textContent = 'Auto-refresh paused - in-page changes (Export to keep them)';
+            }
+        };
+
+        setInterval(() => {
+            const notesFocused = document.activeElement && document.activeElement.classList &&
+                document.activeElement.classList.contains('notes-input');
+            if (!pageDirty && !window.__presenting && !isEditMode && !notesFocused &&
+                document.visibilityState === 'visible' &&
+                !document.getElementById('shortcuts-overlay').classList.contains('visible')) {
+                location.reload();
+            }
+        }, 60000);
+
+        // Text edits in edit mode are in-page changes too
+        document.addEventListener('input', (e) => {
+            if (e.target.isContentEditable) {
+                window.__markDirty();
+                invalidateThumb(e.target.closest('.slide-card'));
+            }
+        });
+
+        // ---------- Zoom ----------
+        const ZOOM_MIN = 0.3, ZOOM_MAX = 1.0, ZOOM_STEP = 0.05, ZOOM_DEFAULT = 0.65;
+        let zoom = ZOOM_DEFAULT;
+        try { zoom = parseFloat(localStorage.getItem('pptmk-zoom')) || ZOOM_DEFAULT; } catch (e) {}
+
+        function applyZoom(z) {
+            zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(z * 100) / 100));
+            document.documentElement.style.setProperty('--scale-factor', zoom);
+            document.getElementById('zoom-label').textContent = Math.round(zoom * 100) + '%';
+            try { localStorage.setItem('pptmk-zoom', zoom); } catch (e) {}
+        }
+
+        document.getElementById('zoom-in').addEventListener('click', () => applyZoom(zoom + ZOOM_STEP));
+        document.getElementById('zoom-out').addEventListener('click', () => applyZoom(zoom - ZOOM_STEP));
+        document.getElementById('zoom-label').addEventListener('click', () => applyZoom(ZOOM_DEFAULT));
+        applyZoom(zoom);
+
+        // ---------- Thumbnail sidebar ----------
+        const thumbRail = document.getElementById('thumb-rail');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const thumbCache = new WeakMap();   // slide-card -> dataURL
+        let capturing = false;
+
+        function sidebarPreferred() {
+            try {
+                const stored = localStorage.getItem('pptmk-sidebar');
+                if (stored !== null) return stored === '1';
+            } catch (e) {}
+            return window.innerWidth >= 1200;
+        }
+
+        function setSidebar(on) {
+            document.body.classList.toggle('has-sidebar', on);
+            sidebarToggle.classList.toggle('active', on);
+            try { localStorage.setItem('pptmk-sidebar', on ? '1' : '0'); } catch (e) {}
+            if (on) window.__refreshThumbs();
+        }
+
+        sidebarToggle.addEventListener('click', () => setSidebar(!document.body.classList.contains('has-sidebar')));
+
+        function invalidateThumb(card) {
+            if (card) thumbCache.delete(card);
+            scheduleThumbCapture();
+        }
+
+        async function captureThumb(card) {
+            if (typeof html2canvas === 'undefined') return null;
+            const content = card.querySelector('.slide-content');
+            if (!content) return null;
+            const savedTransform = content.style.transform;
+            const savedPosition = content.style.position;
+            try {
+                content.style.transform = 'none';
+                content.style.position = 'relative';
+                const canvas = await html2canvas(content, {
+                    scale: 0.15, width: 1280, height: 720,
+                    useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false
+                });
+                return canvas.toDataURL('image/png');
+            } catch (e) {
+                return null;
+            } finally {
+                content.style.transform = savedTransform;
+                content.style.position = savedPosition;
+            }
+        }
+
+        window.__refreshThumbs = function () {
+            if (!document.body.classList.contains('has-sidebar')) return;
+            thumbRail.innerHTML = '';
+            slideCards.forEach((card, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'thumb' + (i === currentSlideIndex ? ' selected' : '');
+                btn.draggable = true;   // drag to reorder, like PowerPoint's panel
+                btn.title = 'Drag to reorder; right-click for slide actions';
+                const cached = thumbCache.get(card);
+                btn.innerHTML = (cached ? `<img src="${cached}" alt="Slide ${i + 1}" draggable="false">`
+                                        : `<div class="thumb-placeholder">${i + 1}</div>`)
+                              + `<span class="thumb-num">${i + 1}</span>`;
+                btn.addEventListener('click', () => selectSlide(i));
+                thumbRail.appendChild(btn);
+            });
+            scheduleThumbCapture();
+        };
+
+        let captureTimer = null;
+        function scheduleThumbCapture() {
+            clearTimeout(captureTimer);
+            captureTimer = setTimeout(captureMissingThumbs, 600);
+        }
+
+        async function captureMissingThumbs() {
+            if (capturing || !document.body.classList.contains('has-sidebar')) return;
+            capturing = true;
+            try {
+                for (const card of slideCards) {
+                    if (thumbCache.has(card)) continue;
+                    const url = await captureThumb(card);
+                    if (url) thumbCache.set(card, url);
+                }
+            } finally {
+                capturing = false;
+            }
+            // Re-render rail with the fresh images (no recursion: cache now filled)
+            if (thumbRail.querySelector('.thumb-placeholder')) window.__refreshThumbs();
+        }
+
+        window.__onSlideSelected = function (index) {
+            thumbRail.querySelectorAll('.thumb').forEach((t, i) => {
+                t.classList.toggle('selected', i === index);
+                if (i === index) t.scrollIntoView({ block: 'nearest' });
+            });
+        };
+
+        // ---------- Speaker notes ----------
+        // Notes persist to the slide file via the edit server (editor.js wires
+        // the input listener); localStorage is only a fallback for file://.
+        function notesKey(card) {
+            const fn = card.querySelector('.slide-filename');
+            return 'pptmk-notes:{{topic_slug}}:' + (fn ? fn.textContent.trim() : 'unknown');
+        }
+
+        function ensureNotes(card) {
+            if (card.querySelector('.notes-wrap')) return;
+            const wrap = document.createElement('div');
+            wrap.className = 'notes-wrap';
+            wrap.innerHTML = `
+                <button class="notes-toggle">
+                    <svg class="notes-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    Speaker notes
+                    <span class="notes-dot"></span>
+                </button>
+                <div class="notes-body">
+                    <textarea class="notes-input" placeholder="Notes for the presenter - shown in the slideshow with N and exported into PowerPoint's notes field."></textarea>
+                </div>`;
+            card.appendChild(wrap);
+
+            const input = wrap.querySelector('.notes-input');
+            // Disk is the source of truth (editor.js fills this from the slide
+            // file); localStorage is only a fallback when there is no server.
+            if (!window.__editorHasServer) {
+                let saved = '';
+                try { saved = localStorage.getItem(notesKey(card)) || ''; } catch (e) {}
+                input.value = saved;
+                wrap.classList.toggle('has-notes', !!saved.trim());
+                input.addEventListener('input', () => {
+                    try { localStorage.setItem(notesKey(card), input.value); } catch (e) {}
+                    wrap.classList.toggle('has-notes', !!input.value.trim());
+                });
+            } else {
+                input.addEventListener('input', () => {
+                    wrap.classList.toggle('has-notes', !!input.value.trim());
+                });
+            }
+
+            wrap.querySelector('.notes-toggle').addEventListener('click', () => wrap.classList.toggle('open'));
+        }
+
+        function initNotes() { slideCards.forEach(ensureNotes); }
+
+        function notesFor(card) {
+            const input = card.querySelector('.notes-input');
+            return input ? input.value.trim() : '';
+        }
+
+        // ---------- Duplicate slide ----------
+        document.getElementById('duplicate-slide-btn').addEventListener('click', duplicateCurrentSlide);
+
+        function duplicateCurrentSlide() {
+            if (!slideCards.length) return;
+
+            // With the edit server, duplicate on disk so the copy is real.
+            if (window.__editorHasServer) {
+                const n = parseInt(slideCards[currentSlideIndex].dataset.slideNumber || '0', 10);
+                if (n) {
+                    if (!window.__beginDeckOp()) return;
+                    fetch('/api/deck/duplicate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ slide_number: n })
+                    }).then(r => r.json()).then(d => {
+                        if (d.error) throw new Error(d.error);
+                        showToast('Slide duplicated', 'success');
+                        setTimeout(() => location.reload(), 400);
+                    }).catch(err => {
+                        window.__endDeckOp();
+                        showToast('Could not duplicate: ' + err.message, 'error');
+                    });
+                    return;
+                }
+            }
+
+            const card = slideCards[currentSlideIndex];
+            const clone = card.cloneNode(true);
+
+            clone.classList.remove('selected', 'editing');
+            // Charts: strip cloned canvases (their bitmaps don't clone) and re-render
+            clone.querySelectorAll('.chart-embed[data-chart-id]').forEach(el => {
+                delete el.dataset.chartRendered;
+                el.querySelectorAll('canvas').forEach(c => c.remove());
+            });
+            // Notes: rebuild for the copy under its own key
+            const cloneNotes = clone.querySelector('.notes-wrap');
+            if (cloneNotes) cloneNotes.remove();
+            const fn = clone.querySelector('.slide-filename');
+            if (fn && !/\(copy/.test(fn.textContent)) fn.textContent = fn.textContent.trim() + ' (copy)';
+            clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+
+            card.after(clone);
+            slideCards = Array.from(document.querySelectorAll('.slide-card'));
+            updateSlideNumbers();
+            updateSlideCount();
+            ensureNotes(clone);
+            if (window.__renderCharts) window.__renderCharts();
+            selectSlide(currentSlideIndex + 1);
+            window.__markDirty();
+            window.__refreshThumbs();
+            showToast('Slide duplicated', 'success');
+        }
+
+        // ---------- Print ----------
+        document.getElementById('print-btn').addEventListener('click', () => window.print());
+
+        // ---------- Shortcuts overlay ----------
+        const shortcutsOverlay = document.getElementById('shortcuts-overlay');
+        document.getElementById('help-btn').addEventListener('click', () => shortcutsOverlay.classList.toggle('visible'));
+        shortcutsOverlay.addEventListener('click', (e) => {
+            if (e.target === shortcutsOverlay) shortcutsOverlay.classList.remove('visible');
+        });
+
+        // ---------- Present (slideshow) mode ----------
+        const presentOverlay = document.getElementById('present-overlay');
+        const presentStage = document.getElementById('present-stage');
+        const presentNotes = document.getElementById('present-notes');
+        const presentCounter = document.getElementById('present-counter');
+        const presentTimerEl = document.getElementById('present-timer');
+
+        let pIndex = 0;
+        let pContent = null;           // the slide node currently on stage
+        let pPlaceholder = null;       // marker left where the node came from
+        let pSavedStyle = null;
+        let pTimerInterval = null;
+        let pStartTime = 0;
+        let hudTimer = null;
+
+        window.__presenting = false;
+
+        function presentFit() {
+            if (!pContent) return;
+            const w = presentStage.clientWidth, h = presentStage.clientHeight;
+            const s = Math.min(w / 1280, h / 720);
+            pContent.style.position = 'absolute';
+            pContent.style.left = ((w - 1280 * s) / 2) + 'px';
+            pContent.style.top = ((h - 720 * s) / 2) + 'px';
+            pContent.style.transform = `scale(${s})`;
+            pContent.style.transformOrigin = 'top left';
+        }
+
+        function presentReturnCurrent() {
+            if (!pContent || !pPlaceholder) return;
+            if (pSavedStyle !== null) pContent.setAttribute('style', pSavedStyle);
+            else pContent.removeAttribute('style');
+            pPlaceholder.replaceWith(pContent);
+            pContent = null;
+            pPlaceholder = null;
+            pSavedStyle = null;
+        }
+
+        function presentShow(index) {
+            if (index < 0) index = 0;
+            if (index >= slideCards.length) { exitPresent(); return; }
+            presentReturnCurrent();
+            pIndex = index;
+            const content = slideCards[index].querySelector('.slide-content');
+            if (!content) { exitPresent(); return; }
+            pSavedStyle = content.getAttribute('style');
+            pPlaceholder = document.createElement('div');
+            pPlaceholder.style.display = 'none';
+            content.replaceWith(pPlaceholder);
+            presentStage.appendChild(content);
+            pContent = content;
+            presentFit();
+            presentCounter.textContent = `${index + 1} / ${slideCards.length}`;
+            presentNotes.textContent = notesFor(slideCards[index]) || 'No notes for this slide.';
+        }
+
+        function enterPresent(fromIndex) {
+            if (!slideCards.length) { showToast('No slides to present', 'error'); return; }
+            if (isEditMode) exitEditMode();
+            window.__presenting = true;
+            presentOverlay.classList.add('visible');
+            presentOverlay.classList.remove('blackout', 'show-notes');
+            presentShow(fromIndex);
+            pStartTime = Date.now();
+            presentTimerEl.textContent = '00:00';
+            pTimerInterval = setInterval(() => {
+                const s = Math.floor((Date.now() - pStartTime) / 1000);
+                presentTimerEl.textContent =
+                    String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+            }, 1000);
+            wakeHud();
+            if (presentOverlay.requestFullscreen) {
+                presentOverlay.requestFullscreen().catch(() => {});
+            }
+        }
+
+        function exitPresent() {
+            if (!window.__presenting) return;
+            window.__presenting = false;
+            clearInterval(pTimerInterval);
+            presentReturnCurrent();
+            presentOverlay.classList.remove('visible', 'blackout', 'show-notes', 'show-hud', 'hide-cursor');
+            if (document.fullscreenElement && document.exitFullscreen) {
+                document.exitFullscreen().catch(() => {});
+            }
+            selectSlide(pIndex);
+        }
+
+        function wakeHud() {
+            presentOverlay.classList.add('show-hud');
+            presentOverlay.classList.remove('hide-cursor');
+            clearTimeout(hudTimer);
+            hudTimer = setTimeout(() => {
+                presentOverlay.classList.remove('show-hud');
+                presentOverlay.classList.add('hide-cursor');
+            }, 2500);
+        }
+
+        document.getElementById('present-btn').addEventListener('click', (e) => {
+            enterPresent(e.shiftKey ? currentSlideIndex : 0);
+        });
+        document.getElementById('present-prev').addEventListener('click', (e) => { e.stopPropagation(); presentShow(pIndex - 1); });
+        document.getElementById('present-next').addEventListener('click', (e) => { e.stopPropagation(); presentShow(pIndex + 1); });
+        document.getElementById('present-exit').addEventListener('click', (e) => { e.stopPropagation(); exitPresent(); });
+        document.getElementById('present-notes-btn').addEventListener('click', (e) => {
+            e.stopPropagation(); presentOverlay.classList.toggle('show-notes');
+        });
+
+        presentStage.addEventListener('click', () => presentShow(pIndex + 1));
+        presentOverlay.addEventListener('mousemove', () => { if (window.__presenting) wakeHud(); });
+        window.addEventListener('resize', presentFit);
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement && window.__presenting) exitPresent();
+        });
+
+        // ---------- Global keyboard shortcuts ----------
+        document.addEventListener('keydown', (e) => {
+            // Slideshow keys
+            if (window.__presenting) {
+                switch (e.key) {
+                    case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': case 'Enter':
+                        e.preventDefault(); presentShow(pIndex + 1); break;
+                    case 'ArrowLeft': case 'ArrowUp': case 'PageUp': case 'Backspace':
+                        e.preventDefault(); presentShow(pIndex - 1); break;
+                    case 'Home': e.preventDefault(); presentShow(0); break;
+                    case 'End': e.preventDefault(); presentShow(slideCards.length - 1); break;
+                    case 'Escape': e.preventDefault(); exitPresent(); break;
+                    case 'n': case 'N': presentOverlay.classList.toggle('show-notes'); break;
+                    case 'b': case 'B': case '.': presentOverlay.classList.toggle('blackout'); break;
+                }
+                return;
+            }
+
+            const typing = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable;
+
+            // F5 works even while typing (it would otherwise reload the page)
+            if (e.key === 'F5') {
+                e.preventDefault();
+                enterPresent(e.shiftKey ? currentSlideIndex : 0);
+                return;
+            }
+            if (typing) return;
+
+            if ((e.metaKey || e.ctrlKey) && (e.key === 'd' || e.key === 'D')) {
+                e.preventDefault(); duplicateCurrentSlide(); return;
+            }
+            if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+            switch (e.key) {
+                case 'p': case 'P': enterPresent(e.shiftKey ? currentSlideIndex : 0); break;
+                case 'Home': e.preventDefault(); selectSlide(0); break;
+                case 'End': e.preventDefault(); selectSlide(slideCards.length - 1); break;
+                case '+': case '=': applyZoom(zoom + ZOOM_STEP); break;
+                case '-': case '_': applyZoom(zoom - ZOOM_STEP); break;
+                case '0': applyZoom(ZOOM_DEFAULT); break;
+                case 't': case 'T': setSidebar(!document.body.classList.contains('has-sidebar')); break;
+                case '?': shortcutsOverlay.classList.toggle('visible'); break;
+                case 'Escape': shortcutsOverlay.classList.remove('visible'); break;
+            }
+        });
+
+        // ---------- Init ----------
+        function initPowerPointFeatures() {
+            slideCards = Array.from(document.querySelectorAll('.slide-card'));
+            initNotes();
+            setSidebar(sidebarPreferred());
+        }
+
+        if (document.readyState !== 'loading') {
+            initPowerPointFeatures();
+        } else {
+            document.addEventListener('DOMContentLoaded', initPowerPointFeatures);
+        }
+        // Charts render synchronously before this script; capture thumbs shortly after load
+        window.addEventListener('load', () => scheduleThumbCapture());
+
+        // Bridges for the editing layer (editor.js)
+        window.isEditModeActive = () => isEditMode;
+        window.currentSlideIndexValue = () => currentSlideIndex;
+        window.selectSlideAt = (i) => selectSlide(i);
+        window.startPresenting = (fromCurrent) => enterPresent(fromCurrent ? currentSlideIndex : 0);
+    </script>
+
+    <script>
+{{native_export_js}}
+    </script>
+
+    <script>
+{{editor_js}}
+    </script>
+</body>
+</html>

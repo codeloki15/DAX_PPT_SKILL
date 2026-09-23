@@ -1,0 +1,15 @@
+# DAX_PPT_SKILL runtime dependencies.
+# After installing, run once: playwright install chromium
+
+# Slide verification and the PPTX export pipeline
+playwright>=1.40
+
+# Native PowerPoint chart, table and notes insertion
+python-pptx>=1.0
+
+# CSV / Excel ingestion and aggregation
+pandas>=2.0
+openpyxl>=3.1
+
+# Note: no API keys and no LLM SDK. The host agent is the loop; this package is
+# the deterministic engine it drives.

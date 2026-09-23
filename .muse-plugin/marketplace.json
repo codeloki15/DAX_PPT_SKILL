@@ -1,0 +1,18 @@
+{
+  "name": "dax-ppt-skill-dev",
+  "description": "Development marketplace for the Data Axle presentation skill",
+  "owner": {
+    "name": "Data Axle"
+  },
+  "plugins": [
+    {
+      "name": "dax-ppt-skill",
+      "description": "Data Axle presentation skill for Muse: consulting-grade decks with native editable PowerPoint charts and tables",
+      "version": "1.0.0",
+      "source": "./",
+      "author": {
+        "name": "Data Axle"
+      }
+    }
+  ]
+}

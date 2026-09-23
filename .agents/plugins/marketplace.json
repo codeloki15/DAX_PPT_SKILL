@@ -1,0 +1,20 @@
+{
+  "name": "dax-ppt-skill-dev",
+  "interface": {
+    "displayName": "Data Axle PPT Skill"
+  },
+  "plugins": [
+    {
+      "name": "dax-ppt-skill",
+      "source": {
+        "source": "url",
+        "url": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "NONE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

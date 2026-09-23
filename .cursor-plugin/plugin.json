@@ -1,0 +1,22 @@
+{
+  "name": "dax-ppt-skill",
+  "displayName": "Data Axle PPT Skill",
+  "description": "Build consulting-grade Data Axle presentations with native editable PowerPoint charts, live preview, and PPTX export",
+  "version": "1.0.0",
+  "author": {
+    "name": "Data Axle"
+  },
+  "homepage": "https://github.com/data-axle/dax-ppt-skill",
+  "repository": "https://github.com/data-axle/dax-ppt-skill",
+  "license": "MIT",
+  "keywords": [
+    "powerpoint",
+    "pptx",
+    "presentations",
+    "slides",
+    "charts",
+    "data-axle",
+    "consulting-deck"
+  ],
+  "skills": "./skills/"
+}

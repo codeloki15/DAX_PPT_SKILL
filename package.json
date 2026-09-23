@@ -1,0 +1,25 @@
+{
+  "name": "dax-ppt-skill",
+  "version": "1.0.0",
+  "description": "Data Axle presentation skill for coding agents - consulting-grade decks with native PowerPoint charts",
+  "type": "module",
+  "main": ".opencode/plugins/dax-ppt-skill.js",
+  "keywords": [
+    "pi-package",
+    "skills",
+    "powerpoint",
+    "pptx",
+    "presentations",
+    "charts",
+    "data-axle"
+  ],
+  "license": "MIT",
+  "pi": {
+    "extensions": [
+      "./.pi/extensions/dax-ppt-skill.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  }
+}
