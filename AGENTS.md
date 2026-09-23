@@ -33,6 +33,11 @@ python3 skills/dax-ppt/scripts/dax.py doctor
 One entry point. Every command prints one JSON object and exits non-zero on
 error. `--workspace` is always explicit — it is what keeps two decks apart.
 
+Paths below are relative to this repository. If the skill is installed elsewhere
+(as a plugin, or under `~/.claude/skills/`), resolve `dax.py` against the
+installed `skills/dax-ppt/` directory and point `--workspace` at the user's
+project.
+
 ```bash
 D="python3 skills/dax-ppt/scripts/dax.py --workspace ./mydeck"
 

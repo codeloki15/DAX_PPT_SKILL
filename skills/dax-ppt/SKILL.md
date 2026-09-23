@@ -20,7 +20,16 @@ PPTX shapes and you lose it.
 ```bash
 pip install playwright python-pptx pandas openpyxl
 playwright install chromium
-python3 skills/dax-ppt/scripts/dax.py doctor     # verifies all of the above
+```
+
+**Locating the CLI.** `scripts/dax.py` sits next to this SKILL.md, so resolve it
+relative to this file rather than to the working directory — when this skill is
+installed as a plugin it does not live under the project you are working in.
+Set it once and reuse it:
+
+```bash
+DAX="python3 /absolute/path/to/skills/dax-ppt/scripts/dax.py"
+$DAX doctor                                      # verifies the install
 ```
 
 `doctor` exits non-zero and names the fix for anything missing. Run it first if
@@ -30,7 +39,8 @@ anything behaves unexpectedly.
 
 All commands take `--workspace DIR`. **Always pass it explicitly** — it decides
 where slides, charts and exports live, and it is what keeps two decks from
-overwriting each other. Set it once per deck and reuse it.
+overwriting each other. Point it at the user's project (not at the skill
+directory), set it once per deck, and reuse it.
 
 ### 1. Understand the ask before building
 
