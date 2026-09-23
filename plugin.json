@@ -1,0 +1,11 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "dax-ppt-skill",
+  "version": "1.0.0",
+  "description": "Build consulting-grade Data Axle presentations: HTML slides in the house style, native editable PowerPoint charts and tables, live browser preview with editing, and PPTX export",
+  "author": { "name": "Data Axle" },
+  "homepage": "https://github.com/codeloki15/DAX_PPT_SKILL",
+  "repository": "https://github.com/codeloki15/DAX_PPT_SKILL",
+  "license": "MIT",
+  "keywords": ["powerpoint", "pptx", "presentations", "slides", "deck", "charts", "data-axle"]
+}

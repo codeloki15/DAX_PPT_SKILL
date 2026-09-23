@@ -20,7 +20,6 @@
     "consulting-deck"
   ],
   "skills": "./skills/",
-  "hooks": {},
   "interface": {
     "displayName": "Data Axle PPT Skill",
     "shortDescription": "Consulting-grade Data Axle decks with native editable PowerPoint charts",

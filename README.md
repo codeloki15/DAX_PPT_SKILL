@@ -5,7 +5,7 @@ An agent skill that builds **Data Axle presentations** — consulting-grade
 native charts and native tables**.
 
 It installs into Claude Code, OpenAI Codex, Cursor, Devin, Hermes, Kimi, Muse,
-opencode, Pi and Gemini from this one repository.
+opencode, Pi, Gemini and Kiro from this one repository.
 
 ---
 
@@ -44,15 +44,20 @@ the fix for anything missing.
 
 ### Per host
 
-| Host | How it finds the skill |
-|---|---|
-| **Claude Code** | `/plugin marketplace add .` then install `dax-ppt-skill`, or copy `skills/dax-ppt/` into `~/.claude/skills/`. `CLAUDE.md` also points at it. |
-| **OpenAI Codex** | Reads `AGENTS.md` at the repo root. `.codex-plugin/plugin.json` declares `skills: ./skills/`. |
-| **Cursor / Devin / Kimi / Muse / Hermes** | Each has its manifest in the matching `.<host>-plugin/` directory, all pointing at the same `skills/` tree. |
-| **opencode** | `.opencode/plugins/dax-ppt-skill.js` |
-| **Pi** | `package.json` → `pi.extensions` + `pi.skills` |
-| **Gemini** | `gemini-extension.json` → `GEMINI.md` |
-| **Anything else** | Point it at `AGENTS.md`. |
+| Host | Manifest | Install |
+|---|---|---|
+| **Claude Code** | `.claude-plugin/` | `/plugin` → Marketplaces → add `https://github.com/codeloki15/DAX_PPT_SKILL`, then install `dax-ppt-skill` |
+| **OpenAI Codex** | `.codex-plugin/`, `.agents/plugins/marketplace.json`, `AGENTS.md` | Add this repo as a Codex plugin marketplace, then install `dax-ppt-skill` |
+| **Cursor** | `.cursor-plugin/` | No install-from-URL for individuals. Submit at cursor.com/marketplace/publish, import as a team marketplace (Teams/Enterprise), or copy the repo into `~/.cursor/plugins/local/dax-ppt-skill` and reload the window (copy, don't symlink) |
+| **Kiro** | `plugin.json` (Agent Plugins format) | Powers panel → Add Custom Power → Import power from GitHub → this repo URL. Or copy `skills/dax-ppt` into `~/.kiro/skills/` |
+| **Gemini CLI** | `gemini-extension.json` | `gemini extensions install https://github.com/codeloki15/DAX_PPT_SKILL` (skills load natively from `skills/`) |
+| **opencode** | `.opencode/plugins/dax-ppt-skill.js` | Load the plugin, or copy `skills/dax-ppt` into `~/.config/opencode/skills/`. It also reads `~/.claude/skills/` |
+| **Pi** | `package.json` → `pi.skills` | Install the repo as a Pi package |
+| **Hermes** | `.hermes-plugin/` | `hermes plugins install codeloki15/DAX_PPT_SKILL`, then add `dax-ppt-skill` to `plugins.enabled` in `~/.hermes/config.yaml` |
+| **Devin** | `.devin-plugin/` | Install the repo as a Devin plugin |
+| **Kimi Code** | `.kimi-plugin/` | Install the repo as a Kimi plugin |
+| **Muse** | `.muse-plugin/` | Add the repo as a Muse marketplace (Muse has no public spec; mirrors superpowers) |
+| **Anything else** | `AGENTS.md` | Point the agent at `AGENTS.md` |
 
 Every host reads the **same** `skills/dax-ppt/` core — the manifests are thin
 pointers, so there are no copies to keep in sync.

@@ -1,34 +1,26 @@
 /**
- * DAX_PPT_SKILL - opencode plugin entry.
+ * DAX_PPT_SKILL - opencode plugin.
  *
- * Registers the Data Axle presentation skill so opencode surfaces it the way
- * other hosts do. The skill itself is plain files: skills/dax-ppt/SKILL.md plus
- * the dax.py CLI, so nothing here duplicates its content.
+ * Adds this repo's skills/ directory to opencode's skill search paths, so the
+ * `dax-ppt` skill (skills/dax-ppt/SKILL.md) is discovered like any other skill.
+ * The skill itself is plain files; nothing here duplicates its content.
+ *
+ * Only the plugin function is exported: opencode may treat every export as a
+ * plugin, so stray non-function exports can break loading.
  */
 
+import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const skillsDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../skills");
 
-export const SKILL_ROOT = join(ROOT, "skills", "dax-ppt");
-export const SKILL_MD = join(SKILL_ROOT, "SKILL.md");
-export const CLI = join(SKILL_ROOT, "scripts", "dax.py");
+export const DaxPptPlugin = async () => ({
+  config: async (config) => {
+    if (Array.isArray(config.skills)) return; // newer array-shaped config; leave untouched
+    config.skills ??= {};
+    config.skills.paths ??= [];
+    if (!config.skills.paths.includes(skillsDir)) config.skills.paths.push(skillsDir);
+  },
+});
 
-export default {
-  name: "dax-ppt-skill",
-  description:
-    "Build Data Axle presentations: consulting-grade HTML slides that export to " +
-    "PowerPoint with editable text, native charts and native tables.",
-  skills: [
-    {
-      id: "dax-ppt",
-      path: SKILL_MD,
-      root: SKILL_ROOT,
-      triggers: [
-        "deck", "slides", "slide deck", "presentation",
-        "powerpoint", "pptx", "board deck", "QBR", "client deck",
-      ],
-    },
-  ],
-};
+export default { id: "dax-ppt-skill", server: DaxPptPlugin };

@@ -15,9 +15,6 @@
   ],
   "license": "MIT",
   "pi": {
-    "extensions": [
-      "./.pi/extensions/dax-ppt-skill.ts"
-    ],
     "skills": [
       "./skills"
     ]
