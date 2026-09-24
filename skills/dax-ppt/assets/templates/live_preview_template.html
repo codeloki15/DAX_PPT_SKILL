@@ -209,6 +209,9 @@
             stroke: var(--accent-primary);
         }
 
+        .hero-badge { cursor: pointer; user-select: none; }
+        .hero-badge:hover { border-color: var(--accent-primary); color: var(--text-primary); }
+
         .hero h1 {
             font-size: clamp(28px, 5vw, 42px);
             font-weight: 800;
@@ -1706,7 +1709,7 @@
         }
 
         @media (max-width: 1100px) {
-            .zoom-control, #print-btn, #help-btn { display: none; }
+            .zoom-control, #refresh-btn, #print-btn, #help-btn { display: none; }
         }
 
         /* ---------- Editing UI ---------- */
@@ -2103,6 +2106,13 @@
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     </button>
                 </div>
+                <button class="nav-tool-btn" id="refresh-btn" title="Refresh preview now (R)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <polyline points="1 20 1 14 7 14"/>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                    </svg>
+                </button>
                 <button class="nav-tool-btn" id="print-btn" title="Print (Ctrl/Cmd+P)">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 6 2 18 2 18 9"/>
@@ -2174,12 +2184,12 @@
         <div class="container">
             <!-- Hero Section -->
             <section class="hero">
-                <div class="hero-badge">
+                <div class="hero-badge" id="refresh-badge" title="Click to refresh the preview now (R)" role="button" tabindex="0">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/>
                         <polyline points="12 6 12 12 16 14"/>
                     </svg>
-                    <span id="refresh-status">Auto-refreshes every 60s</span>
+                    <span id="refresh-status">Auto-refresh in 10:00</span>
                 </div>
                 <h1>{{topic}}</h1>
                 <p>Preview your presentation slides below. Export to PowerPoint when ready.</p>
@@ -2421,6 +2431,7 @@
                 <span><kbd>Home</kbd> <kbd>End</kbd></span><span>First / last slide</span>
                 <span><kbd>+</kbd> <kbd>-</kbd> <kbd>0</kbd></span><span>Zoom in / out / reset</span>
                 <span><kbd>T</kbd></span><span>Toggle thumbnail panel</span>
+                <span><kbd>R</kbd></span><span>Refresh preview now (auto-refreshes every 10 min)</span>
                 <span><kbd>Ctrl/Cmd</kbd>+<kbd>D</kbd></span><span>Duplicate selected slide</span>
                 <span><kbd>Ctrl/Cmd</kbd>+<kbd>P</kbd></span><span>Print (one slide per page)</span>
                 <span><kbd>?</kbd></span><span>Show / hide this help</span>
@@ -3049,7 +3060,7 @@
                             </button>
                         </div>
                         ${copiedToClipboard ? '<p class="copied-notice"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Command copied to clipboard!</p>' : ''}
-                        <p class="hint-text">The agent will regenerate the slide and the preview will auto-refresh in 60 seconds, or you can manually refresh.</p>
+                        <p class="hint-text">The agent will regenerate the slide. The preview auto-refreshes every 10 minutes; press R or click the refresh button in the toolbar to see it sooner.</p>
                     </div>
                     <div class="regenerate-instructions-footer">
                         <button class="regenerate-instructions-close">Got it</button>
@@ -3267,19 +3278,52 @@
             if (pageDirty) return;
             pageDirty = true;
             if (refreshStatus) {
-                refreshStatus.textContent = 'Auto-refresh paused - in-page changes (Export to keep them)';
+                refreshStatus.textContent = 'Auto-refresh paused (unsaved in-page changes) \u00b7 click to refresh now';
             }
         };
 
-        setInterval(() => {
+        // Reload every 10 minutes so agent-side changes show up, but never while the
+        // user is editing, presenting, or looking away. A manual refresh is always
+        // available: the toolbar button, the countdown badge, or the R key.
+        const AUTO_REFRESH_MS = 10 * 60 * 1000;
+        const BUSY_RETRY_MS = 60 * 1000;
+        let nextRefreshAt = Date.now() + AUTO_REFRESH_MS;
+
+        function refreshBlocked() {
             const notesFocused = document.activeElement && document.activeElement.classList &&
                 document.activeElement.classList.contains('notes-input');
-            if (!pageDirty && !window.__presenting && !isEditMode && !notesFocused &&
-                document.visibilityState === 'visible' &&
-                !document.getElementById('shortcuts-overlay').classList.contains('visible')) {
-                location.reload();
+            return pageDirty || window.__presenting || isEditMode || notesFocused ||
+                document.visibilityState !== 'visible' ||
+                document.getElementById('shortcuts-overlay').classList.contains('visible');
+        }
+
+        function formatCountdown(ms) {
+            const s = Math.max(0, Math.ceil(ms / 1000));
+            return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+        }
+
+        // Unsaved text edits are protected by the editor's beforeunload prompt, so a
+        // manual refresh can never silently discard work.
+        window.__refreshNow = function () {
+            if (refreshStatus) refreshStatus.textContent = 'Refreshing...';
+            location.reload();
+        };
+
+        setInterval(() => {
+            if (pageDirty) return;   // __markDirty owns the status text while paused
+            const left = nextRefreshAt - Date.now();
+            if (left <= 0) {
+                if (!refreshBlocked()) { window.__refreshNow(); return; }
+                nextRefreshAt = Date.now() + BUSY_RETRY_MS;   // busy: try again shortly
+                return;
             }
-        }, 60000);
+            if (refreshStatus) {
+                refreshStatus.textContent = `Auto-refresh in ${formatCountdown(left)} \u00b7 click to refresh now`;
+            }
+        }, 1000);
+
+        document.getElementById('refresh-btn').addEventListener('click', () => window.__refreshNow());
+        document.getElementById('refresh-badge').addEventListener('click', () => window.__refreshNow());
 
         // Text edits in edit mode are in-page changes too
         document.addEventListener('input', (e) => {
@@ -3676,6 +3720,7 @@
                 case '-': case '_': applyZoom(zoom - ZOOM_STEP); break;
                 case '0': applyZoom(ZOOM_DEFAULT); break;
                 case 't': case 'T': setSidebar(!document.body.classList.contains('has-sidebar')); break;
+                case 'r': case 'R': window.__refreshNow(); break;
                 case '?': shortcutsOverlay.classList.toggle('visible'); break;
                 case 'Escape': shortcutsOverlay.classList.remove('visible'); break;
             }

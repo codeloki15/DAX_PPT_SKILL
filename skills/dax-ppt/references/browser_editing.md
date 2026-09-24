@@ -88,6 +88,14 @@ So: no separate "browser edits" store. The user's changes are in `WS/slides/slid
 
 Chart edits are the one exception: the slide HTML holds only `<div class="chart-embed" data-chart-id="...">`. The spec JSON at `WS/charts/<id>.json` is the single source of truth, and it drives both the preview render and the native PPTX chart.
 
+### How your changes reach an open preview
+
+The other direction is pull, not push. The preview page reloads itself every **10 minutes**, and only when the user is idle: never while they are editing text, typing notes, presenting, or looking at another tab. If the page is busy at the deadline it retries a minute later.
+
+So after you rewrite a slide, the user may not see it immediately. Tell them: press **R**, click the **refresh** button in the toolbar (between zoom and print), or click the countdown badge in the bottom-right corner. A manual refresh with unsaved in-page edits triggers the browser's "leave page?" prompt, so it cannot silently discard their work.
+
+You do not need to restart the server: `GET /` regenerates `live_preview.html` from the current slide files on every load, so a refresh always shows the latest `slide_NNN.html` and chart specs.
+
 ## 4. http:// vs file:// — why serving matters
 
 One flag decides everything, set purely from the URL scheme:
