@@ -42,13 +42,15 @@ BODY_RE = re.compile(r"(<body[^>]*>)(.*)(</body>)", re.DOTALL | re.IGNORECASE)
 # Slide file helpers
 # =============================================================================
 
-DECK_META_PATH = os.path.join(SLIDES_DIR, "deck_meta.json")
+def _deck_meta_path() -> str:
+    # Resolved per call: paths.set_workspace() rebinds SLIDES_DIR after import.
+    return os.path.join(SLIDES_DIR, "deck_meta.json")
 
 
 def save_deck_title(title: str) -> None:
     """Remember the deck title so the server can regenerate the preview."""
     try:
-        with open(DECK_META_PATH, "w", encoding="utf-8") as f:
+        with open(_deck_meta_path(), "w", encoding="utf-8") as f:
             json.dump({"title": title}, f)
     except OSError:
         pass
@@ -56,7 +58,7 @@ def save_deck_title(title: str) -> None:
 
 def _deck_title() -> str:
     try:
-        with open(DECK_META_PATH, "r", encoding="utf-8") as f:
+        with open(_deck_meta_path(), "r", encoding="utf-8") as f:
             return json.load(f).get("title") or "Presentation"
     except (OSError, json.JSONDecodeError):
         return "Presentation"
@@ -247,78 +249,26 @@ def paste_slide(after: int, html: str) -> Dict[str, Any]:
     return _splice_new_slide(after, html)
 
 
+# The browser's "New slide" gallery. Each entry starts the slide from a house
+# layout (assets/templates/layouts), so a slide added in the browser matches the
+# ones the agent builds. Gallery ids are kept stable for the editor UI.
 BLANK_LAYOUTS = {
-    "title_content": """<div class="slide-container">
-  <div class="kicker">SECTION</div>
-  <div class="action">New slide - replace this with the finding this slide proves</div>
-  <div class="rule"></div>
-  <div class="body">
-    <p class="lead">Supporting context goes here.</p>
-  </div>
-  <div class="foot"><span>Exhibit &mdash;</span><span>Data Axle</span></div>
-</div>""",
-    "section_break": """<div class="slide-container" style="justify-content:center;">
-  <div class="kicker">SECTION</div>
-  <div class="action" style="font-size:38px;">Section title</div>
-  <div class="rule"></div>
-  <div class="foot"><span></span><span>Data Axle</span></div>
-</div>""",
-    "title_slide": """<div class="slide-container" style="justify-content:center;">
-  <div class="kicker">DATA AXLE</div>
-  <div class="action" style="font-size:42px;line-height:1.15;">Presentation title</div>
-  <div class="rule"></div>
-  <p class="lead" style="font-size:15px;">Subtitle or audience &nbsp;|&nbsp; Date</p>
-</div>""",
-    "two_content": """<div class="slide-container">
-  <div class="kicker">SECTION</div>
-  <div class="action">The finding this slide proves</div>
-  <div class="rule"></div>
-  <div class="body">
-    <div style="display:flex;gap:18px;flex:1;min-height:0;">
-      <div class="exh" style="flex:1;display:flex;flex-direction:column;">
-        <div class="exh-t">EXHIBIT &mdash; | LEFT PANEL</div>
-        <ul class="c"><li>First point</li><li>Second point</li></ul>
-      </div>
-      <div class="exh" style="flex:1;display:flex;flex-direction:column;">
-        <div class="exh-t">EXHIBIT &mdash; | RIGHT PANEL</div>
-        <ul class="c"><li>First point</li><li>Second point</li></ul>
-      </div>
-    </div>
-  </div>
-  <div class="foot"><span>Exhibit &mdash;</span><span>Data Axle</span></div>
-</div>""",
-    "table": """<div class="slide-container">
-  <div class="kicker">SECTION</div>
-  <div class="action">The finding this table proves</div>
-  <div class="rule"></div>
-  <div class="body">
-    <div class="exh" style="flex:1;">
-      <div class="exh-t">EXHIBIT &mdash; | COMPARISON</div>
-      <table>
-        <thead><tr><th>Dimension</th><th>Option A</th><th>Option B</th></tr></thead>
-        <tbody>
-          <tr><td><b>Row one</b></td><td>&mdash;</td><td>&mdash;</td></tr>
-          <tr><td><b>Row two</b></td><td>&mdash;</td><td>&mdash;</td></tr>
-          <tr><td><b>Row three</b></td><td>&mdash;</td><td>&mdash;</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <div class="foot"><span>Exhibit &mdash;</span><span>Data Axle</span></div>
-</div>""",
-    "blank": """<div class="slide-container">
-  <div class="body"></div>
-</div>""",
+    "title_slide": "title",
+    "title_content": "narrative",
+    "two_content": "comparison",
+    "table": "exhibit",
+    "section_break": "section",
+    "blank": "blank",
 }
 
 # Human-facing names for the layout gallery.
 LAYOUT_LABELS = {
     "title_slide": "Title slide",
-    "title_content": "Title and content",
-    "two_content": "Two content panels",
-    "table": "Comparison table",
+    "title_content": "Narrative + exhibit",
+    "two_content": "Two panels",
+    "table": "Full-width exhibit",
     "section_break": "Section header",
-    "blank": "Blank",
+    "blank": "Headline only",
 }
 
 
@@ -331,17 +281,9 @@ def insert_slide(after: int, layout: str = "title_content") -> Dict[str, Any]:
     if after != 0 and after not in nums:
         return {"error": f"Slide {after} not found"}
 
-    # Reuse an existing slide's <head> so the new slide inherits the design system.
-    head = ""
-    if nums:
-        with open(slide_path(nums[0]), "r", encoding="utf-8") as f:
-            src = f.read()
-        m = re.search(r"<head[^>]*>.*?</head>", src, re.DOTALL | re.IGNORECASE)
-        head = m.group(0) if m else ""
-
-    new_html = (f"<!DOCTYPE html>\n<html lang=\"en\">{head}<body>\n"
-                f"{BLANK_LAYOUTS[layout]}\n</body></html>")
-
+    from layouts import render
+    slots = {"deck": _deck_title()} if _deck_title() else {}
+    new_html = render(BLANK_LAYOUTS[layout], slots, page=str(after + 1))
     return _splice_new_slide(after, new_html)
 
 

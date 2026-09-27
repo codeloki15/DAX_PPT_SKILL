@@ -1,235 +1,262 @@
 # Data Axle presentation design system
 
-The brand contract for every slide. Read this before writing slide 1, and keep
-it open while building - a deck that drifts from these tokens is off-brand even
-if it looks fine in isolation.
+The brand contract for every slide. Read it before slide 1. A slide that breaks
+these rules looks off-brand next to the others, even if it's fine on its own.
 
-Tool names in this document refer to `dax.py` subcommands:
-`create_chart` -> `dax.py chart`, `create_exhibit` -> `dax.py exhibit`,
-`read_data_file` -> `dax.py profile`, `aggregate_data` -> `dax.py aggregate`,
-`screenshot_slide` -> `dax.py verify`.
+Tool names refer to `dax.py` subcommands: `slide`, `chart`, `exhibit`, `icon`,
+`profile`, `aggregate`, `verify`.
 
 ---
 
-## DATA AXLE PRESENTATION DESIGN SYSTEM
+## The look
 
-You generate slides in the Data Axle house style: a light, consulting-grade deck in the
-tradition of McKinsey and BCG. This is the ONLY style. Do not invent alternative themes,
-do not offer a choice of palettes, and do not use dark backgrounds.
+A white 1280x720 slide with the **Data Axle headline**: a blue kicker, a navy
+action title and a 2px navy rule. Below it is a calm body:
 
-### CORE SPECIFICATIONS
+- one **thesis line** in large, light type
+- up to **three iconed points**
+- **one exhibit panel**: light grey with a navy top rule
+- a **takeaway** pinned to the bottom
 
-**Dimensions:** exactly 1280x720px (16:9)
-**Background:** WHITE (#FFFFFF). Never dark, never gradient.
+Then a **source line** and the **Data Axle footer**.
 
-**Brand colors** (verified from the Data Axle logo and website - use these exact values):
-| Token       | Hex       | Use                                                        |
-|-------------|-----------|------------------------------------------------------------|
-| brandBlue   | #00A0DC   | Kicker text, accent rules, key highlights, arrows           |
-| navy        | #12263F   | Action titles, table header rules, exhibit top borders      |
-| black       | #221F20   | Primary body text, logo-adjacent marks                      |
-| slate       | #3C4456   | Secondary body copy                                         |
-| muted       | #6A7C90   | Labels, footnotes, axis text, source lines                  |
-| rule        | #D4D9E0   | Hairline borders and table rules                            |
-| light       | #F4F6F8   | Panel and callout fills, zebra banding                      |
-| positive    | #1F7A5C   | Favourable state only                                       |
-| warning     | #B07A16   | Watch state only                                            |
-| negative    | #B3341F   | At-risk state only                                          |
+Clean decks come from hierarchy and restraint:
 
-Semantic colors (positive/warning/negative) carry meaning ONLY. Never use them decoratively.
-brandBlue is the single accent - do not introduce additional accent hues.
+- big type for the claim
+- few, short words for the support
+- one exhibit
+- no outlined boxes
 
-**Typography:** Poppins is the Data Axle brand typeface. Load it and use it throughout.
-- Kicker/eyebrow: Poppins 700, 10.5px, letter-spacing .14em, UPPERCASE, brandBlue
-- Action title:   Poppins 600, 26-28px, line-height 1.22, navy
-- Body/lead:      Poppins 400, 13.5px, line-height 1.55, slate
-- Table headers:  Poppins 700, 9.5px, letter-spacing .09em, UPPERCASE, muted
-- Table cells:    Poppins 400, 12px, slate
-- Footnote:       Poppins 400, 9.5px, muted
+A slide is not a memo. When content doesn't fit, cut words. Never shrink type,
+and never add a second panel.
 
-### REQUIRED CDN LINKS (every slide)
+## Start every slide from a layout
 
-```html
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-```
-Do NOT load Tailwind, Font Awesome, Space Grotesk or Inter. Write plain CSS.
-Use NO icon fonts and NO emoji. Structure is conveyed by rules, panels and type weight.
-Icons come only from the bundled library (`dax.py icon`, see references/icons.md): small
-(20-32px) glyphs tinted to a brand token, embedded as the <img> snippet the command returns.
-Use them sparingly and functionally - to label a KPI, a process step or a category - never
-decoratively, and never one per bullet.
+Never hand-write the page frame or the CSS. Start each slide from a house
+layout. It carries the stylesheet, the headline, the margins and the footer, so
+every slide in the deck matches.
 
-### THE ACTION TITLE RULE (most important)
-
-Every slide title states the FINDING, not the topic. A reader must be able to read only the
-titles, in order, and follow the entire argument.
-
-  BAD  (topic label):   "Three layers, one loop"
-  GOOD (action title):  "Three layers form a closed loop; the agent only improves when the loop is complete"
-
-  BAD:   "Ground truth strategy"
-  GOOD:  "Ground truth must be curated by domain owners, because these questions have no external reference"
-
-Titles are full sentences or strong clauses. Aim for 8-18 words. No trailing period.
-
-### SLIDE STRUCTURE (follow exactly)
-
-```html
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Slide Title</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<style>
-*{box-sizing:border-box;}
-body{margin:0;padding:0;font-family:'Poppins',Arial,sans-serif;-webkit-font-smoothing:antialiased;}
-.slide-container{width:1280px;height:720px;background:#FFFFFF;color:#221F20;
-  position:relative;overflow:hidden;display:flex;flex-direction:column;padding:44px 60px 0;}
-.kicker{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#00A0DC;font-weight:700;margin-bottom:7px;}
-.action{font-size:27px;line-height:1.22;font-weight:600;color:#12263F;margin:0 0 12px;letter-spacing:-.005em;}
-.rule{height:2px;background:#12263F;width:100%;margin-bottom:16px;}
-.lead{font-size:13.5px;line-height:1.55;color:#3C4456;max-width:112ch;margin:0 0 16px;}
-.body{flex:1;position:relative;min-height:0;display:flex;flex-direction:column;}
-.foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #D4D9E0;
-  padding:9px 0 12px;font-size:9.5px;color:#6A7C90;}
-h3{font-size:12px;font-weight:600;color:#12263F;margin:0 0 8px;}
-table{width:100%;border-collapse:collapse;}
-th{text-align:left;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:#6A7C90;
-  font-weight:700;padding:7px 10px;border-bottom:1.5px solid #12263F;}
-td{padding:7.5px 10px;border-bottom:1px solid #D4D9E0;font-size:12px;color:#3C4456;line-height:1.4;vertical-align:top;}
-td b{color:#221F20;font-weight:600;}
-.exh{border:1px solid #D4D9E0;border-top:3px solid #12263F;padding:14px 16px;background:#fff;}
-.exh-t{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6A7C90;font-weight:700;margin-bottom:10px;}
-.box{border:1px solid #D4D9E0;padding:12px 14px;background:#F4F6F8;}
-.tag{display:inline-block;font-size:9px;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;font-weight:700;border:1px solid;}
-ul.c{list-style:none;padding:0;margin:0;}
-ul.c li{padding-left:15px;position:relative;margin-bottom:7px;font-size:12px;line-height:1.45;color:#3C4456;}
-ul.c li:before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;background:#00A0DC;}
-ul.c li b{color:#221F20;font-weight:600;}
-.num{font-variant-numeric:tabular-nums;}
-</style></head><body>
-<div class="slide-container">
-  <div class="kicker">SECTION LABEL</div>
-  <div class="action">The finding this slide proves, stated as a sentence</div>
-  <div class="rule"></div>
-  <div class="body">
-    <p class="lead">One or two sentences of supporting context.</p>
-    <!-- exhibit: table, panel grid or SVG diagram -->
-  </div>
-  <div class="foot">
-    <span>Exhibit N &nbsp;|&nbsp; What the exhibit shows</span>
-    <span>Data Axle &nbsp;|&nbsp; Deck title &nbsp;|&nbsp; 3</span>
-  </div>
-</div></body></html>
+```bash
+dax.py --workspace WS slide layouts
+dax.py --workspace WS slide new --slide 2 --layout narrative \
+  --kicker "Market sizing | 2026" \
+  --title "Three segments drive 80% of addressable demand" \
+  --lead "Demand concentrates where data coverage is deepest." \
+  --panel-title "Addressable demand by segment" --panel-subtitle "US\$ billions, 2026" \
+  --source "Data Axle consumer file, Q2 2026" \
+  --exhibit-label "Exhibit 2 | Addressable demand by segment" --deck "Growth plan"
 ```
 
-### BUILD EVERYTHING AS HTML - NEVER AS IMAGES
+| Layout | Use for |
+|---|---|
+| `narrative` | **The default content slide.** Thesis, up to 3 iconed points and a takeaway on the left; one exhibit panel on the right |
+| `exhibit` | A data-led slide: thesis, one full-width chart or table, takeaway |
+| `comparison` | A vs B, before/after, two segments: thesis, two panels side by side, takeaway |
+| `title` | Deck cover |
+| `section` | Section divider |
+| `blank` | Headline and footer only. Use it only when nothing above fits |
 
-All slide content MUST be real HTML text and CSS. Never generate, download or embed an
-image to represent content. Do not call image-generation or stock-image tools for
-diagrams, charts, tables, labels, icons or decoration.
+The new file contains dashed **slot** boxes, for example "Replace with the points
+exhibit". Replace each one with the HTML the named builder returns. `verify`
+reports any slot or "Replace with" text still on the slide.
 
-This is not only a style rule - it changes the exported file. The PPTX exporter converts
-HTML text into NATIVE, EDITABLE PowerPoint text, but it RASTERISES <svg> into a flat
-picture. Measured on the same deck: a flowchart drawn with divs exported as 9 editable
-text runs and 0 pictures; the same diagram drawn as inline SVG exported as 5 text runs
-and 2 images. Anything inside <svg> becomes uneditable in PowerPoint.
+### Anatomy of `narrative`
 
-Therefore:
-- Build diagrams, flowcharts and process maps from styled <div> elements - flexbox or
-  grid for layout, borders for node outlines, background fills for header bars.
-- Draw connectors with CSS: a 1px border or a thin filled div for a line, and a text
-  arrow glyph or a CSS-rotated square for an arrowhead.
-- Build data tables as real <table> markup. Build KPI figures as styled text.
-- AVOID <svg> for anything carrying words. If a purely decorative mark genuinely needs
-  a vector shape, keep all text outside it as HTML.
+```
+KICKER | SECTION LABEL                                         (10.5px, blue text)
+The action title states the finding, one line if possible      (27px, navy, 600)
+────────────────────────────────────────────────────────────── (2px navy rule)
+Thesis: one sentence of context, large and light     ┌━━━━━━━━━━━━━━━━━━━━━━━━━┐
+                                                      │  Panel title            │
+ (●) Point heading                                    │  units / scale          │
+     One or two lines of support, one **bold** fact   │  [ chart ]              │
+ (●) Point heading                                    │                         │
+     One or two lines                                 │  scorecard or table     │
+ (●) Point heading                                    │                         │
+     One or two lines                                 │                         │
+ ▌ KEY TAKEAWAY                                       │                         │
+ ▌ The implication, one or two lines                  └─────────────────────────┘
+Source: where every figure comes from                          (10px, muted)
+──────────────────────────────────────────────────────────────
+Exhibit 1 | what it shows                       Data Axle | Deck title | 3
+```
 
-### NATIVE CHARTS (use the create_chart tool)
+## Type scale
 
-For ANY quantitative display of 3+ data points, call create_chart with structured data
-instead of hand-coding geometry. The spec renders live (Chart.js) in the preview, and on
-export it becomes a NATIVE, EDITABLE PowerPoint chart - the recipient can right-click >
-Edit Data. Never compute bar widths or percentages yourself.
+| Element | Size / weight | Colour |
+|---|---|---|
+| Kicker | 10.5px / 700, uppercase, .14em tracking | blue text `#007BAD` |
+| Action title | 27px / 600 | navy `#12263F` |
+| Thesis (`.lead`) | 18px / 300 | black `#221F20` |
+| Point heading | 16px / 600 | navy |
+| Point text, takeaway | 13.5px / 400, line-height 1.5 | slate `#3C4456` / black |
+| Panel title | 13.5px / 600, centred | black |
+| Panel subtitle (units) | 11px | muted `#5F6F82` |
+| Table cells, scorecard | 12.5px | slate |
+| Table headers, labels | 10–10.5px / 600, uppercase | muted |
+| Source line, footer | 10px | muted |
 
-- Types: column, bar, line, area, pie, doughnut, column_stacked, bar_stacked, waterfall.
-  Waterfall: values are deltas; totals=[indices] marks full bars - give the opening bar
-  its real value (it anchors the running total) and the closing bar 0 (computed).
-- Embed the returned placeholder inside an .exh panel that has real height:
-  <div class="exh" style="flex:1;display:flex;flex-direction:column;">
-    <div class="exh-t">EXHIBIT 1 | REVENUE BY REGION</div>
-    <div class="chart-embed" data-chart-id="rev_by_region" style="flex:1;min-height:200px;"></div>
-  </div>
-- Default colors are the brand ramp (brandBlue first). Only pass explicit colors to
-  encode semantic state.
-- A tiny inline comparison of 2-3 values may still be a div bar; everything larger is
-  a create_chart chart.
+**Floors:** running text is never under 12px, and nothing is under 10px.
+`verify` warns on both.
 
-### PREBUILT EXHIBITS (use the create_exhibit tool)
+Typeface: **Poppins** throughout. The layouts already load it. Don't load other
+fonts, Tailwind or icon fonts.
 
-For standard infographic structures, call create_exhibit rather than hand-coding layout.
-It returns brand-styled, inline-styled HTML to paste into the .body - do not restyle it.
-Types: timeline, process_flow, funnel, matrix_2x2, harvey_table, kpi_row.
-Hand-build only layouts none of these cover.
+## Colour
 
-### DATA FILES (use read_data_file and aggregate_data)
+| Token | Hex | Use |
+|---|---|---|
+| navy | `#12263F` | Action title, rules, panel top rule, icon circles, focus chart series |
+| brandBlue | `#00A0DC` | **Fills and lines only:** takeaway rule, cover rule, chart series. Never small text (2.97:1) |
+| blue text | `#007BAD` | Kickers and any small blue text (4.7:1) |
+| black | `#221F20` | Thesis, bold facts, takeaway text |
+| slate | `#3C4456` | Body copy, table cells |
+| muted | `#5F6F82` | Labels, units, table headers, source, footer (5.1:1) |
+| rule | `#D4D9E0` | Hairlines |
+| light | `#F4F6F8` | The exhibit panel fill |
+| tint | `#EAF6FB` | Takeaway fill |
+| positive / warning / negative | `#1F7A5C` / `#B07A16` / `#B3341F` | **State only**: status dots, scorecard status |
+| warning text | `#8F6212` | Warning status as text (the fill amber is 3.72:1) |
 
-When the user supplies CSV or Excel data, profile it with read_data_file (columns,
-dtypes, preview), then compute every figure with aggregate_data (group-bys, filters,
-top-N, shares). Numbers flow file -> aggregate_data -> create_chart. Never transcribe or
-compute figures mentally.
+**Contrast rule:** text must reach 4.5:1 against its background, or 3:1 at 24px+
+or bold at 18.66px+. `verify` checks every word.
 
-### EXHIBITS
+Semantic colours carry state only, never decoration. Colour a status by what it
+*means*: dominant or on track is positive, at risk is warning, failing is
+negative.
 
-Prefer a real exhibit over prose: a comparison table, a labelled panel grid, or a div-built
-process diagram. Rules for exhibits:
-- Nodes: 1px #D4D9E0 borders, #F4F6F8 or white fills, #12263F header bars with white text.
-- Emphasise at most a few nodes with a 1.5px #00A0DC border. Everything else stays neutral.
-- Size the exhibit so it FILLS the available vertical space. A diagram occupying only the
-  top third with white space beneath it is a layout failure.
-- Label each exhibit bottom-left as "Exhibit N | description".
+## Word budgets
 
-### NEVER INVENT NUMBERS
+| Element | Budget |
+|---|---|
+| Action title | 16 words, one line preferred, never more than two |
+| Thesis | 25 words |
+| Points | at most 3. Heading 6 words; text **28 words** (the builder refuses over 45) |
+| Takeaway | 35 words (refused over 55) |
+| Table | 6 rows x 4 columns |
+| **Body copy per slide** | **170 words.** `verify` warns above this |
 
-If a real figure is not supplied by the user (directly or via a data file read with
-read_data_file / aggregate_data), render an em-dash placeholder and note that figures are
-to be populated. Never fabricate accuracy rates, percentages, revenue or counts.
+Detail that doesn't fit belongs in the speaker notes (`dax.py notes --set`), not
+on the slide.
 
-### THE USER CAN EDIT SLIDES IN THE BROWSER
+## The action title rule
 
-The live preview is served by a local edit server, so the user can edit text,
-formatting, charts, notes and slide order directly in the browser and those
-changes are written back to the same slide files you read and write.
+Every title states the **finding**, not the topic. A reader should be able to
+follow the whole argument from the titles alone, in order.
 
-- Slide files are SHARED STATE. Before editing a slide the user may have touched,
-  read it first (read_slide) - never assume it still matches what you generated.
-- Speaker notes: read with get_slide_notes, write with set_slide_notes. They are
-  exported into PowerPoint's native notes field.
-- If the user says they already fixed something in the browser, believe them and
-  re-read the slide rather than regenerating it.
+  BAD  (topic label):  "Revenue by region"
+  GOOD (action title): "Northeast and West drive 73% of revenue, concentrating renewal risk"
 
-### VERIFY EVERY SLIDE (use the screenshot_slide tool)
+  BAD:  "Opposition landscape"
+  GOOD: "After Bihar, the NDA outscores a fragmented opposition on every capability"
 
-After creating or editing a slide, call screenshot_slide and LOOK at the returned image:
-- Fix any overflow the tool reports (content past 720px is a hard failure).
-- Check for a large empty band above the footer - resize the exhibit to fill the frame.
-- Check that styling matches the rest of the deck.
-Fix and re-verify until clean. Do not build the live preview from unverified slides.
+No trailing period. Keep it to one line where you can; a two-line title eats
+the body's space.
 
-### CRITICAL RULES
+## Components
 
-1.  Exactly 1280x720. White background. Poppins throughout.
-2.  Every title is an ACTION TITLE stating the finding.
-3.  Use ONLY the brand tokens above. brandBlue is the single accent.
-4.  Semantic colors convey state only, never decoration.
-5.  No icon fonts, no emoji, no gradients, no glass-morphism, no glow effects, no drop shadows.
-    Icons only from the bundled library: small, brand-tinted, labelling something.
-6.  Every slide carries the kicker, the 2px navy rule, and the footer line.
-7.  Content must FILL the frame - no large empty band above the footer.
-8.  Content must NEVER overflow 720px. Verify density before finalising.
-9.  Real content only - never Lorem Ipsum or placeholder prose.
-10. Maintain identical styling across all slides in the deck.
-11. HTML text only - never images for content, and avoid <svg> wherever it would
-    carry text, so the exported PPTX keeps editable text.
-12. Quantitative data (3+ points) goes through create_chart; standard structures
-    through create_exhibit; figures come from data files, never from memory.
-13. Every slide is verified with screenshot_slide before the preview is built.
+Paste each builder's HTML into its layout slot. The builders are inline-styled
+and brand-locked, so don't restyle them.
+
+**Points**: the iconed support for the thesis. Each point gets a white glyph
+icon in a navy circle; with no icon, the circle shows its number.
+
+```bash
+dax.py --workspace WS exhibit --type points --data '{"items":[
+  {"icon":"target","title":"Sharper targeting","text":"Match rates rose to **38%** after the identity refresh."},
+  {"icon":"speed","title":"Faster activation","text":"Audiences now reach channels in hours, not days."},
+  {"icon":"filter","title":"Lower cost","text":"Cost per acquisition fell as waste dropped."}]}'
+```
+
+The icons must be glyph icons (see `dax.py icon list`). Use `**bold**` for the one
+fact a reader should catch.
+
+**Takeaway**: the "so what", pinned to the bottom of its column.
+`--data '{"text":"...","label":"Key takeaway"}'`. Label options: *Key takeaway*,
+*Implication*, *Forecast*, *Recommendation*.
+
+**Scorecard**: a compact metric → status list with semantic status colours. It
+suits a panel on its own or under a chart.
+`--data '{"columns":["Dimension","Status"],"rows":[{"label":"Coverage","status":"Ahead of plan","state":"positive"}]}'`
+
+**Chart**: the exhibit panel's main content. See [charts.md](charts.md).
+- The panel title names the chart, so don't pass `chart --title`.
+- **Focus vs context:** colour the subject navy and the comparison grey with
+  `--colors 12263F,A9B4C2`.
+- **Diverging values** (lean, variance, net change): use `bar_stacked` with two
+  series, one holding the negatives and one the positives, zeros elsewhere. Pass
+  `--colors A9B4C2,12263F`.
+
+**Table**: plain `<table>` with `<thead>` and `<tbody>`, 6 rows at most. It
+exports as a native PowerPoint table. Mark status with a dot before the text:
+`<span class="dot pos"></span>Low`. The classes are `pos`, `warn`, `neg` and
+`neutral`.
+
+**KPI row, timeline, process flow, funnel, 2x2, harvey table**: see
+[exhibits.md](exhibits.md). Place them in a panel, or in the left column instead
+of points.
+
+## Build everything as HTML, never as images
+
+All slide content is real HTML text and CSS. The exporter turns HTML text into
+native, editable PowerPoint text, but it rasterises `<svg>` into a flat picture.
+So:
+
+- Build diagrams from styled `<div>`s, never `<svg>`, and never images of text.
+- Build tables as `<table>`, charts with `dax.py chart`, and KPI figures as text.
+- Icons are the one exception: the bundled glyphs via the points exhibit or
+  `dax.py icon`. They carry no words, so exporting them as pictures loses
+  nothing.
+
+## Never invent numbers
+
+Every figure comes from the user or from `profile`/`aggregate` on their data.
+If a figure isn't available, show an em dash `—` and note that it's to be
+populated. Never fabricate rates, percentages, revenue or counts.
+
+## The user can edit slides in the browser
+
+Once the preview is served, the user can edit text, formatting, chart data,
+notes and slide order, and those edits are written back to the slide files. Slide
+files are shared state: re-read a slide before editing it.
+
+## Verify every slide
+
+`dax.py verify --slide N` renders the slide at 1280x720 and returns:
+
+- **issues** (hard failures): overflow past the frame, or an unfilled layout slot
+- **warnings** (house style): body copy over 170 words, running text under 12px,
+  text under 10px, and text below the contrast rule
+
+Fix both, re-verify, then **read the screenshot and look at it**. Check for dead
+space, cramped panels, and styling that differs from the other slides.
+
+## Critical rules
+
+1. Every slide starts from a layout (`dax.py slide new`). Never hand-write the frame or the CSS.
+2. Every title is an action title: the finding, 16 words or fewer.
+3. One thesis line, at most three points, one exhibit panel, one takeaway.
+4. Stay within the word budgets. Cut words; never shrink type below the floors.
+5. Brand tokens only. brandBlue is a fill and line colour, never small text.
+6. Semantic colours convey state only.
+7. No outlined boxes around text, no icon fonts, no emoji, no gradients, no shadows.
+8. HTML text only. No `<svg>` carrying words, no images of content.
+9. Quantitative data goes through `dax.py chart`, and figures come from data.
+10. Every slide passes `verify` with no issues and no warnings before the preview is built.
+
+## Class reference (for hand edits)
+
+`house.css` is embedded in every layout-built slide, and every rule is scoped to
+`.slide-container`.
+
+| Class | Element |
+|---|---|
+| `.kicker`, `.action`, `.rule` | Headline |
+| `.content` (`.stack` for vertical layouts), `.col-main`, `.col-side`, `.cols` | Body grid |
+| `.lead` | Thesis line |
+| `.panel`, `.panel-t`, `.panel-s` | Exhibit panel, its title and units line |
+| `.chart-embed` | Chart placeholder (from `dax.py chart`) |
+| `table`, `th`, `td`, `.num`, `.dot.pos/.warn/.neg/.neutral` | Tables |
+| `.src`, `.foot` | Source line, footer |
+| `.cover`, `.cover-title`, `.cover-rule`, `.cover-sub`, `.sec-num` | Title and section slides |
+| `.slot` | Unfilled layout slot (must not survive) |

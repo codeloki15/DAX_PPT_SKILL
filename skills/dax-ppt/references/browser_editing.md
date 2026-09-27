@@ -166,22 +166,24 @@ WS/slides/.history/<YYYYmmdd-HHMMSS-mmm>/
 
 `.history/` lives inside `WS/slides/`. `dax.py reset --yes` deletes it along with everything else.
 
-## 7. The 6 blank layouts
+## 7. The New Slide gallery
 
-From `BLANK_LAYOUTS` / `LAYOUT_LABELS`, served by `GET /api/layouts` in this fixed order:
+`GET /api/layouts` serves these, in this order. Each one creates the slide from the same house
+layout the agent uses (`dax.py slide new`), so a slide added in the browser matches the rest of
+the deck:
 
-| id | Gallery label | Contents |
+| id | Gallery label | House layout |
 |---|---|---|
-| `title_slide` | Title slide | Centred kicker "DATA AXLE", 42px action, rule, subtitle lead |
-| `title_content` | Title and content | Kicker, action, rule, `.body` with a `p.lead`, footer |
-| `two_content` | Two content panels | Two flexed `.exh` panels, each with an `.exh-t` header and a `ul.c` |
-| `table` | Comparison table | One `.exh` with a 3-column `thead`/`tbody` table |
-| `section_break` | Section header | Centred kicker + 38px action + rule, footer |
-| `blank` | Blank | `.slide-container` with an empty `.body` |
+| `title_slide` | Title slide | `title` |
+| `title_content` | Narrative + exhibit | `narrative` |
+| `two_content` | Two panels | `comparison` |
+| `table` | Full-width exhibit | `exhibit` |
+| `section_break` | Section header | `section` |
+| `blank` | Headline only | `blank` |
 
-An unknown id returns `{"error": "unknown layout '<x>'. Valid: [...]"}`.
-
-`insert_slide` **reuses the `<head>` of slide 1** (`slide_path(nums[0])`) so the new slide inherits the design system CSS. Inserting into an empty deck produces a head-less, unstyled slide — write `slide_001.html` yourself first.
+The new slide carries the deck title (from `deck_meta.json`) and its page number, plus dashed
+**slot** boxes and "Replace with..." text for the user or the agent to fill. `verify` reports any
+that remain. An unknown id returns `{"error": "unknown layout '<x>'. Valid: [...]"}`.
 
 ## 8. After the user edits — agent checklist
 

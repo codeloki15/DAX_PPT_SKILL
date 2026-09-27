@@ -1,0 +1,24 @@
+<div class="slide-container">
+  <div class="kicker">{{kicker}}</div>
+  <div class="action">{{title}}</div>
+  <div class="rule"></div>
+  <div class="content stack">
+    <p class="lead">{{lead}}</p>
+    <div class="cols">
+      <div class="panel">
+        <div class="panel-t">{{left_title}}</div>
+        <!-- SLOT left: chart embed, table, scorecard or points -->
+        <div class="slot" style="flex:1;">Replace with the left exhibit</div>
+      </div>
+      <div class="panel">
+        <div class="panel-t">{{right_title}}</div>
+        <!-- SLOT right: chart embed, table, scorecard or points -->
+        <div class="slot" style="flex:1;">Replace with the right exhibit</div>
+      </div>
+    </div>
+    <!-- SLOT takeaway: paste `dax.py exhibit --type takeaway` -->
+    <div class="slot">Replace with the takeaway exhibit: dax.py exhibit --type takeaway</div>
+  </div>
+  <div class="src"><b>Source:</b> {{source}}</div>
+  <div class="foot"><span>{{exhibit_label}}</span><span>Data Axle &nbsp;|&nbsp; {{deck}} &nbsp;|&nbsp; {{page}}</span></div>
+</div>

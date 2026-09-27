@@ -4,6 +4,7 @@
 Every subcommand prints ONE JSON object to stdout and exits non-zero on error,
 so a host agent can parse the result without scraping prose.
 
+    dax.py slide      new --slide 2 --layout narrative --kicker ... --title ...
     dax.py chart      --id rev --type column --categories ... --series ...
     dax.py exhibit    --type timeline --data '{"items":[...]}'
     dax.py profile    --file sales.csv
@@ -94,6 +95,25 @@ def cmd_chart(args):
 def cmd_exhibit(args):
     from exhibits import create_exhibit
     emit(create_exhibit(args.type, _load_json_arg(args.data, "--data") or {}))
+
+
+SLOT_FLAGS = ("kicker", "title", "lead", "panel_title", "panel_subtitle", "left_title",
+              "right_title", "subtitle", "source", "exhibit_label", "deck", "date", "stamp", "number")
+
+
+def cmd_slide(args):
+    from layouts import list_layouts, new_slide
+    if args.action == "layouts":
+        emit(list_layouts())
+    if args.slide is None or not args.layout:
+        emit({"error": "slide new needs --slide N and --layout NAME (see `dax.py slide layouts`)"})
+    slots = {k: getattr(args, k) for k in SLOT_FLAGS if getattr(args, k) is not None}
+    for raw in args.set or []:
+        if "=" not in raw:
+            emit({"error": f"--set must look like key=value (got {raw!r})"})
+        k, _, v = raw.partition("=")
+        slots[k.strip()] = v
+    emit(new_slide(args.slide, args.layout, slots, force=args.force))
 
 
 def cmd_icon(args):
@@ -282,10 +302,20 @@ def build_parser():
     c.add_argument("--totals", help="Waterfall only: comma-separated total indices")
     c.set_defaults(func=cmd_chart)
 
+    sl = sub.add_parser("slide", help="Start a slide from a house layout")
+    sl.add_argument("action", choices=["new", "layouts"])
+    sl.add_argument("--slide", type=int, help="Slide number (writes slides/slide_NNN.html)")
+    sl.add_argument("--layout", choices=["narrative", "exhibit", "comparison", "title", "section", "blank"])
+    for k in SLOT_FLAGS:
+        sl.add_argument("--" + k.replace("_", "-"), dest=k)
+    sl.add_argument("--set", action="append", metavar="KEY=VALUE", help="Any other slot")
+    sl.add_argument("--force", action="store_true", help="Overwrite an existing slide file")
+    sl.set_defaults(func=cmd_slide)
+
     e = sub.add_parser("exhibit", help="Build a brand-styled exhibit")
     e.add_argument("--type", required=True,
-                   choices=["timeline", "process_flow", "funnel", "matrix_2x2",
-                            "harvey_table", "kpi_row"])
+                   choices=["points", "takeaway", "scorecard", "timeline", "process_flow",
+                            "funnel", "matrix_2x2", "harvey_table", "kpi_row"])
     e.add_argument("--data", required=True, help="JSON payload, or @file.json")
     e.set_defaults(func=cmd_exhibit)
 

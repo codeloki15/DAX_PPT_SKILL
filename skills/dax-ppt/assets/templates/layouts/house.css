@@ -1,0 +1,63 @@
+/* Data Axle house style. Every rule is scoped to .slide-container because the
+   live preview injects each slide's CSS into one shared page.
+   Headline + footer: Data Axle. Body components: calm consulting layout. */
+*{box-sizing:border-box;}
+body{margin:0;padding:0;}
+.slide-container{width:1280px;height:720px;background:#FFFFFF;color:#221F20;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;padding:44px 60px 0;font-family:'Poppins',Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+
+/* Headline: kicker, action title, 2px navy rule */
+.slide-container .kicker{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#007BAD;margin:0 0 7px;}
+.slide-container .action{font-size:27px;font-weight:600;line-height:1.22;color:#12263F;margin:0 0 12px;letter-spacing:-.005em;}
+.slide-container .rule{flex:0 0 auto;height:2px;background:#12263F;width:100%;margin:0 0 20px;}
+.slide-container .kicker:empty,.slide-container .lead:empty,.slide-container .panel-t:empty,
+.slide-container .panel-s:empty{display:none;}
+
+/* Body */
+.slide-container .content{flex:1;min-height:0;display:flex;gap:40px;padding:0 0 14px;}
+.slide-container .content.stack{flex-direction:column;gap:16px;}
+.slide-container .col{display:flex;flex-direction:column;min-width:0;min-height:0;}
+.slide-container .col-main{flex:1.15;}
+.slide-container .col-side{flex:1;}
+.slide-container .cols{flex:1;min-height:0;display:flex;gap:24px;}
+.slide-container .lead{font-size:18px;font-weight:300;line-height:1.45;color:#221F20;margin:0 0 20px;}
+.slide-container .content.stack .lead{margin:0;}
+
+/* The one exhibit panel: light fill, navy top rule, no box outline */
+.slide-container .panel{background:#F4F6F8;border-top:4px solid #12263F;padding:16px 20px 18px;display:flex;flex-direction:column;
+  flex:1;min-height:0;min-width:0;}
+.slide-container .panel-t{font-size:13.5px;font-weight:600;color:#221F20;text-align:center;margin:0 0 2px;}
+.slide-container .panel-s{font-size:11px;color:#5F6F82;text-align:center;margin:0 0 6px;}
+.slide-container .chart-embed{flex:1;min-height:160px;position:relative;}
+
+/* Tables */
+.slide-container table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.slide-container th{text-align:left;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#5F6F82;
+  padding:6px 8px;border-bottom:1.5px solid #12263F;}
+.slide-container td{padding:7px 8px;border-bottom:1px solid #E1E6EC;color:#3C4456;vertical-align:top;line-height:1.35;}
+.slide-container td b{color:#221F20;font-weight:600;}
+.slide-container .num{font-variant-numeric:tabular-nums;text-align:right;}
+.slide-container .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:0;}
+.slide-container .dot.pos{background:#1F7A5C;}
+.slide-container .dot.warn{background:#B07A16;}
+.slide-container .dot.neg{background:#B3341F;}
+.slide-container .dot.neutral{background:#8A99AB;}
+
+/* Source line and footer */
+.slide-container .src{flex:0 0 auto;font-size:10px;color:#5F6F82;margin:0 0 6px;}
+.slide-container .src b{font-weight:600;color:#3C4456;}
+.slide-container .foot{flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;gap:24px;
+  border-top:1px solid #D4D9E0;padding:9px 0 12px;font-size:10px;color:#5F6F82;}
+
+/* Unfilled layout slot - verify flags any that remain */
+.slide-container .slot{border:1.5px dashed #C9D1DB;color:#5F6F82;font-size:12px;display:flex;align-items:center;
+  justify-content:center;text-align:center;padding:14px;min-height:56px;}
+
+/* Title and section slides */
+.slide-container.cover{padding:0 96px;}
+.slide-container .cover-inner{flex:1;display:flex;flex-direction:column;justify-content:center;}
+.slide-container .cover-title{font-size:42px;font-weight:600;line-height:1.18;color:#12263F;margin:0;max-width:980px;letter-spacing:-.01em;}
+.slide-container .cover-rule{width:88px;height:3px;background:#00A0DC;margin:26px 0 20px;}
+.slide-container .cover-sub{font-size:18px;font-weight:300;line-height:1.5;color:#3C4456;margin:0;max-width:900px;}
+.slide-container .sec-num{font-size:60px;font-weight:300;line-height:1;color:#007BAD;margin:0 0 16px;}
+.slide-container .cover .foot,.slide-container.cover .foot{margin-bottom:22px;}

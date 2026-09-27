@@ -6,7 +6,7 @@ The bundled icon library: 55 entries in `assets/icons/`, used through `dax.py ic
 
 - **Functional, never decorative.** An icon labels something - a KPI tile, a process step, a category column, an `.exh-t` caption. If removing it loses no information, remove it.
 - **Small.** 20-32px on the slide. The default is 24px. Never scale an icon up to fill space.
-- **On palette.** Glyphs are tinted to a brand token: `navy` (default) or `brandBlue`; `black`, `slate` and `muted` for quiet labels. `positive` / `warning` / `negative` only when the icon signals that state.
+- **On palette.** Glyphs are tinted to a brand token: `navy` (default), `brandBlue`, or `white` inside a navy circle; `black`, `slate` and `muted` for quiet labels. `positive` / `warning` / `negative` only when the icon signals that state.
 - **One per label.** A KPI row of four tiles gets at most four icons. A slide never gets an icon in every bullet.
 - **No icon fonts, no emoji, no inline `<svg>`.** Always the `<img>` snippet the command returns.
 - Illustration-style icons keep their own colours, which are off palette. Use one only when the user asked for that specific icon.
@@ -29,6 +29,11 @@ dax.py --workspace WS icon use data-axle-logo --size 24
 | `--color` | Brand token or 6-digit hex. Ignored for illustrations and the logo. |
 
 ## Patterns
+
+**Points (the most common use):** `dax.py exhibit --type points` puts each icon in white inside a
+navy circle for you. Pass the icon name in each item. Only **glyph** icons work there.
+
+
 
 **KPI tile with an icon label** (paste inside a `kpi_row` tile or your own):
 

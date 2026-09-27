@@ -9,11 +9,13 @@ Follow the `dax-ppt` skill. CLI: `python3 "${CLAUDE_PLUGIN_ROOT}/skills/dax-ppt/
 (or the `scripts/dax.py` next to the skill's SKILL.md). Use this deck's workspace.
 
 For each slide (`list` gives them all):
-1. `verify --slide N`, then look at the screenshot. Record overflow, dead space above the footer,
-   cramped or stranded exhibits, and styling that drifts from the other slides.
+1. `verify --slide N`. Record every issue (overflow, unfilled slots) and every warning (over 170
+   body words, text under 12px, text under 10px, low contrast). Then look at the screenshot: dead
+   space, cramped panels, and styling that drifts from the other slides.
 2. Read the HTML and audit it:
    - the title is a finding, not a topic label
-   - kicker, 2px navy rule and footer are present
+   - the slide was built from a house layout: kicker, 2px navy rule, source line and footer present
+   - one thesis line, at most three points, one exhibit panel, one takeaway - no outlined text boxes
    - only brand tokens are used; semantic green/amber/red mark state only
    - no icon fonts, emoji, gradients or shadows; any icon is from the bundled library
      (`../images/icon-*.png` or the logo), 20-32px, brand-tinted, and labels something

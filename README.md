@@ -15,14 +15,15 @@ You describe the deck; the agent builds it. Under the hood:
 
 | Capability | How |
 |---|---|
-| **House style** | Every slide is 1280x720 HTML on white, Poppins throughout, locked to the Data Axle palette with brandBlue `#00A0DC` as the single accent. |
+| **House style** | Every slide is 1280x720 HTML on white, Poppins throughout, locked to the Data Axle palette. The Data Axle headline and footer frame a calm body: one thesis line, up to three iconed points, one exhibit panel, one takeaway. |
+| **Slide layouts** | `dax.py slide new --layout narrative` (also `exhibit`, `comparison`, `title`, `section`) starts every slide from the same frame and stylesheet, so a deck looks designed rather than assembled. Word budgets and type floors keep it from becoming a text dump. |
 | **Action titles** | Every title states the finding, not the topic — read the titles in order and you have the argument. |
 | **Native charts** | `dax.py chart` stores a structured spec. It renders live with Chart.js in the preview and becomes a **real PowerPoint chart** on export — recipients can right-click → *Edit Data*. 9 types including waterfall. |
 | **Native tables** | Plain `<table>` markup is rebuilt as a real PowerPoint table, so every cell stays editable text instead of a flattened picture. |
 | **Real numbers** | `dax.py profile` / `aggregate` read CSV and Excel with pandas. Every figure traces back to a file; the agent never does arithmetic in its head. |
 | **Exhibit library** | `dax.py exhibit` builds timelines, process flows, funnels, 2×2 matrices, harvey-ball tables and KPI rows — brand-styled, div-only, fully editable after export. |
 | **Icon library** | `dax.py icon` ships 54 icons plus the Data Axle logo. Glyphs are tinted to a brand token on the fly and dropped into the deck as a ready `<img>` snippet — small, functional labels for KPIs and process steps, never decoration. |
-| **Visual verification** | `dax.py verify` renders each slide headlessly, flags overflow programmatically, and hands the agent a screenshot to actually look at. |
+| **Visual verification** | `dax.py verify` renders each slide headlessly and flags overflow, unfilled slots, more than 170 words of body copy, text under 12px and text that fails contrast. It then hands the agent the screenshot to look at. |
 | **Live editing** | The preview is served from `127.0.0.1`, so the user can edit text, formatting, chart data, notes and slide order in the browser — and those edits are written back to the same slide files. |
 
 No API keys. The host agent is the loop; this package is the deterministic
@@ -116,6 +117,7 @@ D="python3 skills/dax-ppt/scripts/dax.py --workspace ./mydeck"
 
 $D profile   --file sales.csv
 $D aggregate --file sales.csv --group-by region --agg revenue:sum --share
+$D slide     new --slide 1 --layout narrative --title "..." --lead "..."
 $D chart     --id rev --type column --categories "NE,MW,S,W" \
              --series "FY25:14.9,9.8,18.1,13.2"
 $D icon      use kpi --size 24 --color navy        # -> <img> snippet for a KPI tile
@@ -141,6 +143,7 @@ skills/dax-ppt/
 │   ├── dax.py                the only entry point
 │   ├── deck.py               preview assembly + PPTX export
 │   ├── charts.py             chart specs + native PPTX charts/tables/notes
+│   ├── layouts.py            slide layouts: `dax.py slide new`
 │   ├── exhibits.py           the brand-styled exhibit library
 │   ├── data_tools.py         CSV/Excel profiling and aggregation
 │   ├── verify.py             headless screenshots + overflow detection
@@ -149,6 +152,7 @@ skills/dax-ppt/
 ├── references/               design system, charts, exhibits, data, export, editing, icons
 └── assets/
     ├── templates/            live preview, editor, native export, chart renderer
+    │   └── layouts/          house.css + narrative, exhibit, comparison, title, section
     └── icons/                54 icons + logo, icons.json manifest, ATTRIBUTION.md
 ```
 

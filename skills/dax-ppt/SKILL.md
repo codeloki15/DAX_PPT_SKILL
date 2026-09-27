@@ -18,7 +18,7 @@ PPTX shapes and you lose it.
 ## Setup (once)
 
 ```bash
-pip install playwright python-pptx pandas openpyxl
+pip install playwright python-pptx pandas openpyxl pillow
 playwright install chromium
 ```
 
@@ -73,92 +73,116 @@ isn't available, render an em-dash `—` and note that it is to be populated.
 Fabricated accuracy rates and revenue numbers are the fastest way to destroy
 trust in a deck.
 
-### 3. Build each slide as HTML
+### 3. Start every slide from a layout
 
-Write `WS/slides/slide_001.html`, `slide_002.html`, … with your normal file
-tools. Copy the skeleton from
-[references/design_system.md](references/design_system.md) — it defines the
-required structure: `.kicker`, `.action`, the 2px navy rule, `.body`, `.foot`.
+Never write a slide's frame or CSS by hand. Start it from a house layout. The
+layout carries the stylesheet, the Data Axle headline, the margins and the
+footer, which is what makes every slide in the deck match:
 
-Non-negotiables (the full contract is in the design system reference):
+```bash
+dax.py --workspace WS slide new --slide 2 --layout narrative \
+  --kicker "Market sizing | 2026" \
+  --title "Three segments drive 80% of addressable demand" \
+  --lead "Demand concentrates where data coverage is deepest." \
+  --panel-title "Addressable demand by segment" --panel-subtitle "US\$ billions" \
+  --source "Data Axle consumer file, Q2 2026" \
+  --exhibit-label "Exhibit 2 | Addressable demand by segment" --deck "Growth plan"
+```
 
-- Exactly **1280x720**, white background, **Poppins** throughout
-- Every title is an **action title** — it states the finding, not the topic.
+| Layout | Use for |
+|---|---|
+| `narrative` | **Default.** Thesis, up to 3 iconed points and a takeaway on the left; one exhibit panel on the right |
+| `exhibit` | Data-led: thesis, one full-width chart or table, takeaway |
+| `comparison` | A vs B: thesis, two panels side by side, takeaway |
+| `title` / `section` | Deck cover / section divider |
+
+The new slide contains dashed **slot** boxes ("Replace with the points
+exhibit…"). Replace each one with the HTML from the builder it names (step 4).
+
+What makes a slide look professional rather than a text dump (the full contract
+is in [references/design_system.md](references/design_system.md), **read it
+before slide 1**):
+
+- **One thesis line, at most three points, one exhibit panel, one takeaway.**
+  Not more boxes and not more bullets.
+- **Word budgets:** title 16 words, thesis 25, each point 28, takeaway 35, and
+  **170 words of body copy per slide**. If it doesn't fit, cut words and move
+  detail to the speaker notes. Never shrink the type.
+- **Type floors:** running text at least 12px, nothing under 10px, and every
+  word must pass contrast. brandBlue `#00A0DC` is for fills and lines; small blue
+  text uses `#007BAD`.
+- Every title is an **action title**: it states the finding, not the topic.
   Bad: "Revenue by region". Good: "Northeast and West drive 73% of revenue,
-  concentrating renewal risk in two regions"
-- Brand tokens only: brandBlue `#00A0DC` (single accent), navy `#12263F`,
-  black `#221F20`, slate `#3C4456`, muted `#6A7C90`, rule `#D4D9E0`,
-  light `#F4F6F8`. Semantic green/amber/red carry **state only**, never decoration
-- **No icon fonts, no emoji, no gradients, no shadows, no dark backgrounds.** Icons
-  only from the bundled library via `dax.py icon` — small, brand-tinted, labelling
-  something (see below)
-- **Never use `<svg>` for anything carrying words** — SVG rasterises into a flat
-  picture on export. Build diagrams from styled `<div>`s so the text stays editable
-- Content must **fill** the frame and must **never** overflow 720px
+  concentrating renewal risk".
+- **No outlined boxes around text, no icon fonts, no emoji, no gradients, no
+  shadows.** Never use `<svg>` for anything carrying words, because it
+  rasterises on export.
 
-### 4. Use the builders instead of hand-coding
+### 4. Fill the slots with the builders
 
-**Charts** — any quantitative display of 3+ points:
+**Points**: the left column's support. Each point gets a white glyph icon in a
+navy circle:
 
 ```bash
-dax.py --workspace WS chart --id rev_by_region --type column \
+dax.py --workspace WS exhibit --type points --data '{"items":[
+  {"icon":"target","title":"Sharper targeting","text":"Match rates rose to **38%** after the refresh."},
+  {"icon":"speed","title":"Faster activation","text":"Audiences reach channels in hours, not days."},
+  {"icon":"filter","title":"Lower cost","text":"Cost per acquisition fell as waste dropped."}]}'
+```
+
+**Takeaway**: the "so what", pinned to the bottom:
+`--type takeaway --data '{"text":"...","label":"Key takeaway"}'`
+
+**Chart**: the exhibit panel's main content, for any quantitative display of 3+
+points:
+
+```bash
+dax.py --workspace WS chart --id rev_by_region --type bar \
   --categories "Northeast,Midwest,South,West" \
-  --series "FY24:12.4,9.1,15.2,11.8" --series "FY25:14.9,9.8,18.1,13.2" \
-  --title "Revenue by region"
+  --series "FY25:14.9,9.8,18.1,13.2" --series "FY24:12.4,9.1,15.2,11.8" \
+  --colors 12263F,A9B4C2
 ```
 
-It prints `embed_html` — paste that into a container with real height:
+Paste its `embed_html` into the panel slot. Don't pass `--title`, because the
+panel title already names the chart. `--colors 12263F,A9B4C2` means focus (navy)
+vs context (grey). For diverging values, use `bar_stacked` with the negatives and
+positives in two series. Types:
+`column bar line area pie doughnut column_stacked bar_stacked waterfall`.
+Details: [references/charts.md](references/charts.md).
 
-```html
-<div class="exh" style="flex:1;display:flex;flex-direction:column;">
-  <div class="exh-t">EXHIBIT 1 | REVENUE BY REGION</div>
-  <div class="chart-embed" data-chart-id="rev_by_region" style="flex:1;min-height:200px;"></div>
-</div>
-```
+**Scorecard**: a metric → status list, with the status coloured by state. Put
+it under the chart or on its own:
+`--type scorecard --data '{"columns":["Dimension","Status"],"rows":[{"label":"Coverage","status":"Ahead of plan","state":"positive"}]}'`
 
-Types: `column bar line area pie doughnut column_stacked bar_stacked waterfall`.
-Never compute bar widths or percentages yourself. Details and the waterfall
-convention: [references/charts.md](references/charts.md).
+**Tables**: plain `<table>` with `<thead>` and `<tbody>`, 6 rows at most. Mark
+status with `<span class="dot pos"></span>`. Tables export as native PowerPoint
+tables.
 
-**Exhibits** — standard infographic structures:
+**Other exhibits**: `kpi_row timeline process_flow funnel matrix_2x2
+harvey_table`. See [references/exhibits.md](references/exhibits.md). **Icons**:
+`dax.py icon list --search …`. See [references/icons.md](references/icons.md).
 
-```bash
-dax.py --workspace WS exhibit --type kpi_row \
-  --data '{"kpis":[{"value":"38%","label":"Match rate lift","state":"positive"}]}'
-```
+Builders return inline-styled, brand-locked HTML. Paste it as returned. If a
+builder reports `warnings` about the word budget, cut the text and rebuild.
 
-Types: `timeline process_flow funnel matrix_2x2 harvey_table kpi_row`. The
-returned HTML is brand-styled and inline-styled — paste it, don't restyle it.
-Exact input shapes: [references/exhibits.md](references/exhibits.md).
-
-**Icons** — a bundled library of brand-tintable glyphs plus the Data Axle logo:
-
-```bash
-dax.py --workspace WS icon list --search revenue
-dax.py --workspace WS icon use kpi --size 24 --color navy
-```
-
-`icon use` writes the tinted icon into the workspace and returns `img_html` to
-paste next to the thing it labels — a KPI tile, a process step, a caption. Icons
-are functional, never decorative: at most one per label, 20-32px, tinted to
-`navy` or `brandBlue`. Full rules and catalogue: [references/icons.md](references/icons.md).
-
-**Tables** stay as plain `<table>` markup — the exporter rebuilds them as native
-PowerPoint tables automatically.
-
-### 5. Verify every slide — actually look at it
+### 5. Verify every slide, and actually look at it
 
 ```bash
 dax.py --workspace WS verify --slide 1
 ```
 
-This renders the slide headlessly at exactly 1280x720 and reports overflow
-programmatically. **Then read the returned `image_path` with your image-reading
-tool and look at the screenshot.** The overflow check catches hard failures; only
-your eyes catch a diagram stranded in the top third, a cramped exhibit, or
-styling that drifted from the other slides.
+This renders the slide headlessly at exactly 1280x720 and returns:
 
-Fix and re-verify until clean. Do not build the preview from unverified slides.
+- **issues**: overflow past the frame, or an unfilled layout slot
+- **warnings**: more than 170 words of body copy, running text under 12px, text
+  under 10px, or text below the contrast rule
+
+Fix both kinds and re-verify. **Then read the returned `image_path` and look at
+the screenshot.** The checks catch hard failures; only your eyes catch a cramped
+panel, a dead band, or a slide that doesn't match its neighbours.
+
+Do not build the preview until every slide verifies with no issues and no
+warnings.
 
 ### 6. Preview, and hand it to the user
 
@@ -199,10 +223,11 @@ into PowerPoint's real notes field.
 | `doctor` | Check dependencies; run this first when anything misbehaves |
 | `profile --file F` | Profile a CSV/TSV/Excel file |
 | `aggregate --file F --agg COL:FN` | Group, filter, top-N, percent-of-total |
+| `slide new --slide N --layout L ...` / `slide layouts` | Start a slide from a house layout |
 | `chart --id ID --type T ...` | Create a native chart spec |
 | `exhibit --type T --data JSON` | Build a brand-styled exhibit |
 | `icon list [--search Q]` / `icon use NAME` | Find a bundled icon / tint it and get the `<img>` snippet |
-| `verify --slide N` | Screenshot + overflow check |
+| `verify --slide N` | Screenshot, overflow, word budget, text size and contrast checks |
 | `preview --title T` | Stitch slides into the live preview |
 | `open [--serve]` | Serve the preview and open a browser |
 | `notes --slide N [--set ...]` | Read or write speaker notes |

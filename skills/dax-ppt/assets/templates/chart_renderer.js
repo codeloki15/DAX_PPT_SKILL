@@ -6,10 +6,10 @@
     if (!window.Chart) return;
     const SPECS = window.CHART_SPECS || {};
     const BRAND = ['00A0DC', '12263F', '6A7C90', '8FD3EE', '3C4456', 'D4D9E0'];
-    const GRID = '#E4E8ED', TICK = '#6A7C90', AXIS = '#D4D9E0';
+    const GRID = '#E4E8ED', TICK = '#5F6F82', AXIS = '#D4D9E0';
 
     Chart.defaults.font.family = "'Poppins', Arial, sans-serif";
-    Chart.defaults.font.size = 10;
+    Chart.defaults.font.size = 11;
     Chart.defaults.color = '#3C4456';
 
     function colorFor(spec, i) {
@@ -67,7 +67,8 @@
             borderWidth: isLine ? 2 : (isPie ? 1 : 0),
             fill: spec.type === 'area',
             tension: 0,
-            pointRadius: spec.type === 'line' ? 2 : 0
+            pointRadius: spec.type === 'line' ? 2 : 0,
+            maxBarThickness: 26
         }));
         return {
             type: isPie ? spec.type : (isLine ? 'line' : 'bar'),
@@ -79,7 +80,7 @@
                     legend: {
                         display: isPie || spec.series.length > 1,
                         position: 'bottom',
-                        labels: { boxWidth: 10, boxHeight: 10 }
+                        labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8, padding: 14 }
                     },
                     title: { display: !!spec.title, text: spec.title || '' }
                 },

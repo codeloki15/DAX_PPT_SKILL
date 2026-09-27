@@ -237,6 +237,27 @@ python3 scripts/dax.py --workspace ./decks/q3 chart \
 
 `colors[i]` is used when `i` is in range; beyond that the ramp resumes. For `pie` / `doughnut` the index is the **slice**, not the series.
 
+### Placement and colour patterns (house style)
+
+- A chart lives in a layout's **exhibit panel**. The panel's `--panel-title` names it and
+  `--panel-subtitle` gives the units, so **don't pass `--title`**, which would repeat it inside the
+  chart.
+- **Focus vs context:** colour the subject navy and the comparison grey: `--colors 12263F,A9B4C2`.
+  This is the one non-semantic use of `--colors`, and it guides the eye to the claim.
+- **Diverging values** (lean, variance, net change): use `bar_stacked` with two series, one
+  holding the negatives and one the positives, zeros elsewhere. Grey for the "against" side, navy
+  for the "for" side:
+
+```bash
+dax.py --workspace WS chart --id lean_index --type bar_stacked \
+  --categories "Tamil Nadu,Kerala,West Bengal,Puducherry,Assam" \
+  --series "Opposition advantage:-8,-5,-2,0,0" --series "NDA advantage:0,0,0,3,6" \
+  --colors A9B4C2,12263F
+```
+
+The preview renders ticks at 11px in muted `#5F6F82`, legends as round dots, and bars capped
+at 26px thick.
+
 ## 8. `number_format`
 
 An Excel format code string, stored as-is and applied to the value-axis tick labels (`number_format_is_linked = False`) and to data labels on single-series `column` / `bar`.

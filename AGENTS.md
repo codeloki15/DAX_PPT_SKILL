@@ -44,11 +44,12 @@ D="python3 skills/dax-ppt/scripts/dax.py --workspace ./mydeck"
 $D profile   --file sales.csv                      # columns, dtypes, ranges
 $D aggregate --file sales.csv --group-by region \
              --agg revenue:sum --sort-by revenue_sum --share
+$D slide     new --slide 1 --layout narrative --title "..." --lead "..."   # start every slide here
 $D chart     --id rev --type column \
              --categories "NE,MW,S,W" --series "FY25:14.9,9.8,18.1,13.2"
 $D exhibit   --type kpi_row --data '{"kpis":[{"value":"38%","label":"Lift"}]}'
 $D icon      use kpi --size 24 --color navy         # brand-tinted icon -> <img> snippet
-# ... write slide_001.html, slide_002.html, ... into ./mydeck/slides/
+# ... fill each slide's slots with `exhibit --type points|takeaway|scorecard` and chart embeds
 $D verify    --slide 1                             # screenshot + overflow check
 $D preview   --title "Deck title"
 $D open      --serve                               # live, user-editable preview
@@ -59,14 +60,16 @@ $D export    --title "Deck title"                  # -> final_outputs/*.pptx
 
 1. **Action titles.** Every slide title states the finding, not the topic. A
    reader must follow the whole argument from the titles alone.
-2. **Never invent numbers.** Figures come from `profile`/`aggregate` or from the
+2. **Layouts, not text dumps.** Every slide starts from `slide new`: one thesis line, at most
+   three points, one exhibit panel, one takeaway, 170 words of body copy at most.
+3. **Never invent numbers.** Figures come from `profile`/`aggregate` or from the
    user. Missing figures render as `—`, never as a plausible guess.
-3. **HTML text, never images.** No `<svg>` carrying words, no generated imagery —
+4. **HTML text, never images.** No `<svg>` carrying words, no generated imagery —
    both rasterise and stop being editable in PowerPoint. Use `chart` and `exhibit`.
-4. **Look at every slide.** Run `verify`, then actually read the returned PNG.
+5. **Look at every slide.** Run `verify`, then actually read the returned PNG.
    The overflow check catches hard failures; only your eyes catch dead space and
    drift.
-5. **Slide files are shared state.** Once the preview is open the user can edit
+6. **Slide files are shared state.** Once the preview is open the user can edit
    the same files. Re-read a slide before editing it.
 
 ## Tool mapping

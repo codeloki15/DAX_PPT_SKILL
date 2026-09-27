@@ -31,6 +31,7 @@ MANIFEST = os.path.join(ICONS_DIR, "icons.json")
 BRAND_COLORS = {
     "navy": "12263F", "brandblue": "00A0DC", "black": "221F20", "slate": "3C4456",
     "muted": "6A7C90", "positive": "1F7A5C", "warning": "B07A16", "negative": "B3341F",
+    "white": "FFFFFF",   # for icons inside navy circles (the points exhibit)
 }
 DEFAULT_COLOR = "navy"
 MIN_SIZE, MAX_SIZE, DEFAULT_SIZE = 12, 96, 24

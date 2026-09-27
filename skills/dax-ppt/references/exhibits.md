@@ -38,6 +38,62 @@ dax.py exhibit --type {timeline|process_flow|funnel|matrix_2x2|harvey_table|kpi_
 
 ---
 
+## points
+
+The left column's support in the `narrative` layout: 2-4 items (3 is the norm). Each is a navy
+circle holding a **white glyph icon** (or its number if no icon), a 16px heading and 13.5px text.
+The block stretches to fill the column above the takeaway, so there's no dead band.
+
+```bash
+dax.py --workspace WS exhibit --type points --data '{"items":[
+  {"icon":"target","title":"Sharper targeting","text":"Match rates rose to **38%** after the refresh."},
+  {"icon":"speed","title":"Faster activation","text":"Audiences reach channels in hours, not days."},
+  {"icon":"filter","title":"Lower cost","text":"Cost per acquisition fell as waste dropped."}]}'
+```
+
+| Key | Rule |
+|---|---|
+| `title` | required; **6 words** (warns), refused over 10 |
+| `text` | required; **28 words** (warns), refused over 45. `**bold**` marks the one fact to catch |
+| `icon` | optional; must be a **glyph** icon (`dax.py icon list` shows `style`). Illustrations are refused |
+
+Errors: `points needs 2-4 items`, `point N needs both title and text`,
+`point N text is 52 words; the limit is 45 (aim for 28)`, `icon 'coins' is a colour illustration`.
+Over-budget-but-allowed text returns `warnings` - cut and rebuild.
+
+## takeaway
+
+The "so what", pinned to the bottom of its column: light blue tint, brandBlue left rule, a small
+navy label, 13.5px text.
+
+```bash
+dax.py --workspace WS exhibit --type takeaway --data '{"label":"Implication","text":"Shift spend to the three segments that drive **80%** of demand."}'
+```
+
+`label` defaults to *Key takeaway* (others: *Implication*, *Forecast*, *Recommendation*).
+`text` budget: **35 words** (warns), refused over 55.
+
+## scorecard
+
+A compact metric -> status list. The status text is coloured by state. It fits the exhibit
+panel on its own or under a chart.
+
+```bash
+dax.py --workspace WS exhibit --type scorecard --data '{"columns":["Dimension","Status, 2026"],"rows":[
+  {"label":"Electoral machinery","status":"NDA dominant","state":"positive"},
+  {"label":"Alliance cohesion","status":"INDIA bloc fragmented","state":"warning"},
+  {"label":"Leadership clarity","status":"Opposition void","state":"negative"}]}'
+```
+
+| Key | Rule |
+|---|---|
+| `rows` | 2-7 of `{label, status, state?}` |
+| `state` | `positive` / `warning` / `negative` / `neutral` (default). Colours meet 4.5:1, and warning uses the darker `#8F6212` |
+| `columns` | optional, exactly two headings; default `["Metric","Status"]` |
+
+It's built from divs, not a `<table>`, so the state colours survive export as editable coloured
+text.
+
 ## timeline
 
 Horizontal milestone rail: uppercase blue label, blue dot on a grey rule, navy title, optional description.
@@ -192,6 +248,8 @@ Gotchas
 ---
 
 ## kpi_row
+
+Tiles use the panel look: light fill with a navy top rule, a 30px figure and a 10.5px label.
 
 Row of stat tiles: big navy tabular-nums value, uppercase muted label, optional colored delta.
 
