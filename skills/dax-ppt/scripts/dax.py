@@ -96,6 +96,15 @@ def cmd_exhibit(args):
     emit(create_exhibit(args.type, _load_json_arg(args.data, "--data") or {}))
 
 
+def cmd_icon(args):
+    from icons import list_icons, use_icon
+    if args.action == "list":
+        emit(list_icons(args.search or args.name))
+    if not args.name:
+        emit({"error": "icon use needs a name, e.g. `dax.py icon use kpi --color navy`"})
+    emit(use_icon(args.name, size=args.size, color=args.color))
+
+
 def cmd_profile(args):
     from data_tools import read_data_file
     try:
@@ -214,6 +223,7 @@ def cmd_doctor(args):
     for mod, fix in (("pptx", "pip install python-pptx"),
                      ("pandas", "pip install pandas"),
                      ("openpyxl", "pip install openpyxl"),
+                     ("PIL", "pip install pillow"),
                      ("playwright", "pip install playwright")):
         try:
             __import__(mod)
@@ -237,6 +247,9 @@ def cmd_doctor(args):
         p_ = os.path.join(paths.TEMPLATES_DIR, asset)
         check(f"asset:{asset}", os.path.exists(p_), p_,
               "Re-install the skill; assets/templates/ is incomplete.")
+    icons_manifest = os.path.join(paths.SKILL_DIR, "assets", "icons", "icons.json")
+    check("asset:icons.json", os.path.exists(icons_manifest), icons_manifest,
+          "Re-install the skill; assets/icons/ is incomplete.")
 
     if report["problems"]:
         report["status"] = "error"
@@ -328,6 +341,15 @@ def build_parser():
     rs = sub.add_parser("reset", help="Wipe slides/charts/screenshots")
     rs.add_argument("--yes", action="store_true", help="Required. This deletes files.")
     rs.set_defaults(func=cmd_reset)
+
+    ic = sub.add_parser("icon", help="Bundled icon library: list, or copy one into the deck")
+    ic.add_argument("action", choices=["list", "use"])
+    ic.add_argument("name", nargs="?", help="Icon name (for use), or a search term (for list)")
+    ic.add_argument("--search", help="Filter list by name or tag")
+    ic.add_argument("--size", type=int, default=24, help="CSS pixels, 12-96 (default 24)")
+    ic.add_argument("--color", help="Brand token: navy (default), brandBlue, black, slate, "
+                                    "muted, positive, warning, negative - or 6-digit hex")
+    ic.set_defaults(func=cmd_icon)
 
     dr = sub.add_parser("doctor", help="Check dependencies are installed")
     dr.set_defaults(func=cmd_doctor)

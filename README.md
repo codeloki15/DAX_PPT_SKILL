@@ -21,6 +21,7 @@ You describe the deck; the agent builds it. Under the hood:
 | **Native tables** | Plain `<table>` markup is rebuilt as a real PowerPoint table, so every cell stays editable text instead of a flattened picture. |
 | **Real numbers** | `dax.py profile` / `aggregate` read CSV and Excel with pandas. Every figure traces back to a file; the agent never does arithmetic in its head. |
 | **Exhibit library** | `dax.py exhibit` builds timelines, process flows, funnels, 2×2 matrices, harvey-ball tables and KPI rows — brand-styled, div-only, fully editable after export. |
+| **Icon library** | `dax.py icon` ships 54 icons plus the Data Axle logo. Glyphs are tinted to a brand token on the fly and dropped into the deck as a ready `<img>` snippet — small, functional labels for KPIs and process steps, never decoration. |
 | **Visual verification** | `dax.py verify` renders each slide headlessly, flags overflow programmatically, and hands the agent a screenshot to actually look at. |
 | **Live editing** | The preview is served from `127.0.0.1`, so the user can edit text, formatting, chart data, notes and slide order in the browser — and those edits are written back to the same slide files. |
 
@@ -117,6 +118,7 @@ $D profile   --file sales.csv
 $D aggregate --file sales.csv --group-by region --agg revenue:sum --share
 $D chart     --id rev --type column --categories "NE,MW,S,W" \
              --series "FY25:14.9,9.8,18.1,13.2"
+$D icon      use kpi --size 24 --color navy        # -> <img> snippet for a KPI tile
 $D verify    --slide 1
 $D preview   --title "Q3 regional performance"
 $D open      --serve
@@ -144,8 +146,10 @@ skills/dax-ppt/
 │   ├── verify.py             headless screenshots + overflow detection
 │   ├── edit_server.py        local server backing the editable preview
 │   └── paths.py              workspace layout
-├── references/               design system, charts, exhibits, data, export, editing
-└── assets/templates/         live preview, editor, native export, chart renderer
+├── references/               design system, charts, exhibits, data, export, editing, icons
+└── assets/
+    ├── templates/            live preview, editor, native export, chart renderer
+    └── icons/                54 icons + logo, icons.json manifest, ATTRIBUTION.md
 ```
 
 ### Export pipeline

@@ -54,8 +54,10 @@ brandBlue is the single accent - do not introduce additional accent hues.
 ```
 Do NOT load Tailwind, Font Awesome, Space Grotesk or Inter. Write plain CSS.
 Use NO icon fonts and NO emoji. Structure is conveyed by rules, panels and type weight.
-Exception: if the user EXPLICITLY asks for icons, small monochrome icons downloaded via
-the Freepik tools may be embedded as <img> - never icon fonts, never decoratively.
+Icons come only from the bundled library (`dax.py icon`, see references/icons.md): small
+(20-32px) glyphs tinted to a brand token, embedded as the <img> snippet the command returns.
+Use them sparingly and functionally - to label a KPI, a process step or a category - never
+decoratively, and never one per bullet.
 
 ### THE ACTION TITLE RULE (most important)
 
@@ -219,7 +221,8 @@ Fix and re-verify until clean. Do not build the live preview from unverified sli
 2.  Every title is an ACTION TITLE stating the finding.
 3.  Use ONLY the brand tokens above. brandBlue is the single accent.
 4.  Semantic colors convey state only, never decoration.
-5.  No icons, no emoji, no gradients, no glass-morphism, no glow effects, no drop shadows.
+5.  No icon fonts, no emoji, no gradients, no glass-morphism, no glow effects, no drop shadows.
+    Icons only from the bundled library: small, brand-tinted, labelling something.
 6.  Every slide carries the kicker, the 2px navy rule, and the footer line.
 7.  Content must FILL the frame - no large empty band above the footer.
 8.  Content must NEVER overflow 720px. Verify density before finalising.

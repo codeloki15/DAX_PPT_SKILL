@@ -89,7 +89,9 @@ Non-negotiables (the full contract is in the design system reference):
 - Brand tokens only: brandBlue `#00A0DC` (single accent), navy `#12263F`,
   black `#221F20`, slate `#3C4456`, muted `#6A7C90`, rule `#D4D9E0`,
   light `#F4F6F8`. Semantic green/amber/red carry **state only**, never decoration
-- **No icons, no emoji, no gradients, no shadows, no dark backgrounds**
+- **No icon fonts, no emoji, no gradients, no shadows, no dark backgrounds.** Icons
+  only from the bundled library via `dax.py icon` — small, brand-tinted, labelling
+  something (see below)
 - **Never use `<svg>` for anything carrying words** — SVG rasterises into a flat
   picture on export. Build diagrams from styled `<div>`s so the text stays editable
 - Content must **fill** the frame and must **never** overflow 720px
@@ -128,6 +130,18 @@ dax.py --workspace WS exhibit --type kpi_row \
 Types: `timeline process_flow funnel matrix_2x2 harvey_table kpi_row`. The
 returned HTML is brand-styled and inline-styled — paste it, don't restyle it.
 Exact input shapes: [references/exhibits.md](references/exhibits.md).
+
+**Icons** — a bundled library of brand-tintable glyphs plus the Data Axle logo:
+
+```bash
+dax.py --workspace WS icon list --search revenue
+dax.py --workspace WS icon use kpi --size 24 --color navy
+```
+
+`icon use` writes the tinted icon into the workspace and returns `img_html` to
+paste next to the thing it labels — a KPI tile, a process step, a caption. Icons
+are functional, never decorative: at most one per label, 20-32px, tinted to
+`navy` or `brandBlue`. Full rules and catalogue: [references/icons.md](references/icons.md).
 
 **Tables** stay as plain `<table>` markup — the exporter rebuilds them as native
 PowerPoint tables automatically.
@@ -187,6 +201,7 @@ into PowerPoint's real notes field.
 | `aggregate --file F --agg COL:FN` | Group, filter, top-N, percent-of-total |
 | `chart --id ID --type T ...` | Create a native chart spec |
 | `exhibit --type T --data JSON` | Build a brand-styled exhibit |
+| `icon list [--search Q]` / `icon use NAME` | Find a bundled icon / tint it and get the `<img>` snippet |
 | `verify --slide N` | Screenshot + overflow check |
 | `preview --title T` | Stitch slides into the live preview |
 | `open [--serve]` | Serve the preview and open a browser |
@@ -207,9 +222,12 @@ arguments inline or as `@path/to/file.json`.
 - [data.md](references/data.md) — profile output and the aggregate grammar
 - [export.md](references/export.md) — how the export works and how to triage it
 - [browser_editing.md](references/browser_editing.md) — what the user can edit live
+- [icons.md](references/icons.md) — the bundled icon library: rules, patterns, catalogue
 
 ## Out of scope
 
-Image generation and stock-photo/icon search are deliberately absent. The house
+Image generation and stock-photo/icon *search* are deliberately absent. The house
 style is **HTML text and CSS only** — content is never an image, because images
-export as flat pictures instead of editable text. Use exhibits and charts.
+export as flat pictures instead of editable text. Use exhibits and charts. The one
+exception is the bundled icon library (`dax.py icon`): small glyphs that export as
+pictures, which is acceptable only because they carry no words.

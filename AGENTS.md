@@ -47,6 +47,7 @@ $D aggregate --file sales.csv --group-by region \
 $D chart     --id rev --type column \
              --categories "NE,MW,S,W" --series "FY25:14.9,9.8,18.1,13.2"
 $D exhibit   --type kpi_row --data '{"kpis":[{"value":"38%","label":"Lift"}]}'
+$D icon      use kpi --size 24 --color navy         # brand-tinted icon -> <img> snippet
 # ... write slide_001.html, slide_002.html, ... into ./mydeck/slides/
 $D verify    --slide 1                             # screenshot + overflow check
 $D preview   --title "Deck title"

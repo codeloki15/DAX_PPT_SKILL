@@ -11,5 +11,8 @@ python-pptx>=1.0
 pandas>=2.0
 openpyxl>=3.1
 
+# Tinting icons from the bundled icon library (dax.py icon)
+pillow>=10.0
+
 # Note: no API keys and no LLM SDK. The host agent is the loop; this package is
 # the deterministic engine it drives.

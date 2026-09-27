@@ -15,7 +15,9 @@ For each slide (`list` gives them all):
    - the title is a finding, not a topic label
    - kicker, 2px navy rule and footer are present
    - only brand tokens are used; semantic green/amber/red mark state only
-   - no icons, emoji, gradients, shadows, and no `<svg>` carrying text (it rasterises on export)
+   - no icon fonts, emoji, gradients or shadows; any icon is from the bundled library
+     (`../images/icon-*.png` or the logo), 20-32px, brand-tinted, and labels something
+   - no `<svg>` carrying text (it rasterises on export)
    - every number traces to user input or an `aggregate` result; unknowns are an em-dash
    - charts are `.chart-embed` placeholders inside a panel with real height; tables have `<thead>` and `<tbody>`
 

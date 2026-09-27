@@ -1,0 +1,772 @@
+{
+  "version": 1,
+  "icons": [
+    {
+      "name": "accept",
+      "file": "accept.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "check",
+        "done",
+        "approved",
+        "success",
+        "complete",
+        "yes"
+      ]
+    },
+    {
+      "name": "adding",
+      "file": "adding.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "add",
+        "plus",
+        "new",
+        "create",
+        "insert",
+        "expand"
+      ]
+    },
+    {
+      "name": "ai-brain",
+      "file": "ai-brain.png",
+      "style": "illustration",
+      "tintable": false,
+      "tags": [
+        "ai",
+        "brain",
+        "intelligence",
+        "model",
+        "llm",
+        "machine learning"
+      ]
+    },
+    {
+      "name": "ai-model",
+      "file": "ai-model.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "ai",
+        "model",
+        "neural",
+        "machine learning",
+        "llm",
+        "network"
+      ]
+    },
+    {
+      "name": "arrow-right",
+      "file": "arrow-right.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "arrow",
+        "next",
+        "forward",
+        "flow",
+        "step",
+        "direction"
+      ]
+    },
+    {
+      "name": "artificial-intelligence",
+      "file": "artificial-intelligence.png",
+      "style": "illustration",
+      "tintable": false,
+      "tags": [
+        "ai",
+        "atom",
+        "science",
+        "intelligence",
+        "model"
+      ]
+    },
+    {
+      "name": "banned",
+      "file": "banned.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "block",
+        "stop",
+        "prohibited",
+        "no",
+        "forbidden",
+        "exclude",
+        "suppress"
+      ]
+    },
+    {
+      "name": "brand",
+      "file": "brand.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "brand",
+        "award",
+        "badge",
+        "reputation",
+        "identity",
+        "ribbon"
+      ]
+    },
+    {
+      "name": "calendar",
+      "file": "calendar.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "calendar",
+        "date",
+        "schedule",
+        "timeline",
+        "month",
+        "deadline"
+      ]
+    },
+    {
+      "name": "campaign",
+      "file": "campaign.png",
+      "style": "illustration",
+      "tintable": false,
+      "tags": [
+        "campaign",
+        "marketing",
+        "megaphone",
+        "promotion",
+        "announce",
+        "outreach"
+      ]
+    },
+    {
+      "name": "channel",
+      "file": "channel.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "channel",
+        "media",
+        "distribution",
+        "share",
+        "social",
+        "outlets"
+      ]
+    },
+    {
+      "name": "coding",
+      "file": "coding.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "code",
+        "developer",
+        "engineering",
+        "api",
+        "software",
+        "integration"
+      ]
+    },
+    {
+      "name": "coins",
+      "file": "coins.png",
+      "style": "illustration",
+      "tintable": false,
+      "tags": [
+        "money",
+        "revenue",
+        "cost",
+        "price",
+        "coins",
+        "budget",
+        "finance"
+      ]
+    },
+    {
+      "name": "context",
+      "file": "context.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "context",
+        "document",
+        "notes",
+        "brief",
+        "reference",
+        "file"
+      ]
+    },
+    {
+      "name": "conversation",
+      "file": "conversation.png",
+      "style": "illustration",
+      "tintable": false,
+      "tags": [
+        "chat",
+        "conversation",
+        "message",
+        "question",
+        "support",
+        "dialogue"
+      ]
+    },
+    {
+      "name": "cpu",
+      "file": "cpu.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "cpu",
+        "chip",
+        "processor",
+        "compute",
+        "hardware",
+        "infrastructure"
+      ]
+    },
+    {
+      "name": "crowd-of-users",
+      "file": "crowd-of-users.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "audience",
+        "users",
+        "customers",
+        "people",
+        "segment",
+        "population",
+        "crowd"
+      ]
+    },
+    {
+      "name": "data",
+      "file": "data.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "data",
+        "records",
+        "dataset",
+        "cloud",
+        "media",
+        "assets"
+      ]
+    },
+    {
+      "name": "data-analysis",
+      "file": "data-analysis.png",
+      "style": "illustration",
+      "tintable": false,
+      "tags": [
+        "analysis",
+        "analyst",
+        "chart",
+        "insight",
+        "report",
+        "dashboard"
+      ]
+    },
+    {
+      "name": "data-axle-logo",
+      "file": "data-axle-logo.svg",
+      "style": "logo",
+      "tintable": false,
+      "tags": [
+        "logo",
+        "brand",
+        "data axle",
+        "wordmark"
+      ]
+    },
+    {
+      "name": "database",
+      "file": "database.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "database",
+        "storage",
+        "warehouse",
+        "schema",
+        "table",
+        "records"
+      ]
+    },
+    {
+      "name": "database-filled",
+      "file": "database-filled.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "database",
+        "storage",
+        "warehouse",
+        "records",
+        "sql",
+        "filled"
+      ]
+    },
+    {
+      "name": "deal",
+      "file": "deal.png",
+      "style": "illustration",
+      "tintable": false,
+      "tags": [
+        "deal",
+        "handshake",
+        "agreement",
+        "partnership",
+        "contract",
+        "sales"
+      ]
+    },
+    {
+      "name": "direction",
+      "file": "direction.png",
+      "style": "illustration",
+      "tintable": false,
+      "tags": [
+        "direction",
+        "signpost",
+        "choice",
+        "decision",
+        "path",
+        "options"
+      ]
+    },
+    {
+      "name": "email",
+      "file": "email.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "email",
+        "envelope",
+        "message",
+        "mail",
+        "newsletter",
+        "outreach"
+      ]
+    },
+    {
+      "name": "excel",
+      "file": "excel.png",
+      "style": "illustration",
+      "tintable": false,
+      "tags": [
+        "excel",
+        "spreadsheet",
+        "xlsx",
+        "data file",
+        "microsoft"
+      ]
+    },
+    {
+      "name": "favorite",
+      "file": "favorite.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "star",
+        "favorite",
+        "rating",
+        "quality",
+        "top",
+        "preferred"
+      ]
+    },
+    {
+      "name": "filter",
+      "file": "filter.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "filter",
+        "funnel",
+        "segment",
+        "refine",
+        "criteria",
+        "select"
+      ]
+    },
+    {
+      "name": "fingerprint",
+      "file": "fingerprint.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "identity",
+        "fingerprint",
+        "unique",
+        "match",
+        "security",
+        "verification"
+      ]
+    },
+    {
+      "name": "google-docs",
+      "file": "google-docs.png",
+      "style": "illustration",
+      "tintable": false,
+      "tags": [
+        "document",
+        "docs",
+        "google",
+        "file",
+        "text"
+      ]
+    },
+    {
+      "name": "interactive",
+      "file": "interactive.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "click",
+        "interactive",
+        "touch",
+        "engagement",
+        "action",
+        "cta"
+      ]
+    },
+    {
+      "name": "interconnected",
+      "file": "interconnected.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "connected",
+        "hierarchy",
+        "org",
+        "structure",
+        "tree",
+        "relationship"
+      ]
+    },
+    {
+      "name": "kpi",
+      "file": "kpi.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "kpi",
+        "metric",
+        "gauge",
+        "performance",
+        "dashboard",
+        "speedometer"
+      ]
+    },
+    {
+      "name": "layout",
+      "file": "layout.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "layout",
+        "grid",
+        "template",
+        "structure",
+        "design",
+        "wireframe"
+      ]
+    },
+    {
+      "name": "link",
+      "file": "link.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "link",
+        "url",
+        "connection",
+        "hyperlink",
+        "integration",
+        "chain"
+      ]
+    },
+    {
+      "name": "list",
+      "file": "list.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "list",
+        "bullets",
+        "checklist",
+        "items",
+        "agenda",
+        "menu"
+      ]
+    },
+    {
+      "name": "lock",
+      "file": "lock.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "lock",
+        "security",
+        "privacy",
+        "compliance",
+        "protected",
+        "encryption"
+      ]
+    },
+    {
+      "name": "mail",
+      "file": "mail.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "mail",
+        "envelope",
+        "email",
+        "letter",
+        "direct mail",
+        "post"
+      ]
+    },
+    {
+      "name": "multi-channel",
+      "file": "multi-channel.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "multichannel",
+        "channels",
+        "hierarchy",
+        "distribution",
+        "branches"
+      ]
+    },
+    {
+      "name": "multi-channel-devices",
+      "file": "multi-channel-devices.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "multichannel",
+        "devices",
+        "omnichannel",
+        "mobile",
+        "desktop",
+        "cross-device"
+      ]
+    },
+    {
+      "name": "network",
+      "file": "network.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "network",
+        "graph",
+        "nodes",
+        "connections",
+        "ecosystem",
+        "integration"
+      ]
+    },
+    {
+      "name": "quality",
+      "file": "quality.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "quality",
+        "certified",
+        "badge",
+        "verified",
+        "standard",
+        "seal"
+      ]
+    },
+    {
+      "name": "refresh",
+      "file": "refresh.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "refresh",
+        "reload",
+        "cycle",
+        "repeat",
+        "iterate",
+        "loop"
+      ]
+    },
+    {
+      "name": "refresh-data",
+      "file": "refresh-data.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "refresh",
+        "sync",
+        "update",
+        "database",
+        "reload",
+        "pipeline"
+      ]
+    },
+    {
+      "name": "route",
+      "file": "route.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "route",
+        "path",
+        "journey",
+        "roadmap",
+        "steps",
+        "process"
+      ]
+    },
+    {
+      "name": "send",
+      "file": "send.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "send",
+        "submit",
+        "deliver",
+        "launch",
+        "paper plane",
+        "dispatch"
+      ]
+    },
+    {
+      "name": "speed",
+      "file": "speed.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "speed",
+        "fast",
+        "performance",
+        "velocity",
+        "latency",
+        "gauge"
+      ]
+    },
+    {
+      "name": "support",
+      "file": "support.png",
+      "style": "illustration",
+      "tintable": false,
+      "tags": [
+        "support",
+        "help",
+        "service",
+        "care",
+        "assistance",
+        "customer service"
+      ]
+    },
+    {
+      "name": "system-update",
+      "file": "system-update.png",
+      "style": "illustration",
+      "tintable": false,
+      "tags": [
+        "update",
+        "upgrade",
+        "system",
+        "settings",
+        "gear",
+        "maintenance"
+      ]
+    },
+    {
+      "name": "target",
+      "file": "target.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "target",
+        "goal",
+        "objective",
+        "aim",
+        "precision",
+        "bullseye"
+      ]
+    },
+    {
+      "name": "task",
+      "file": "task.png",
+      "style": "illustration",
+      "tintable": false,
+      "tags": [
+        "task",
+        "checklist",
+        "clipboard",
+        "todo",
+        "plan",
+        "action items"
+      ]
+    },
+    {
+      "name": "tick",
+      "file": "tick.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "check",
+        "tick",
+        "done",
+        "complete",
+        "verified",
+        "approved"
+      ]
+    },
+    {
+      "name": "two-arrows",
+      "file": "two-arrows.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "exchange",
+        "swap",
+        "sync",
+        "transfer",
+        "bidirectional",
+        "integration"
+      ]
+    },
+    {
+      "name": "user",
+      "file": "user.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "user",
+        "person",
+        "profile",
+        "customer",
+        "contact",
+        "individual"
+      ]
+    },
+    {
+      "name": "warning",
+      "file": "warning.png",
+      "style": "glyph",
+      "tintable": true,
+      "tags": [
+        "warning",
+        "risk",
+        "alert",
+        "caution",
+        "issue",
+        "attention"
+      ]
+    }
+  ]
+}
