@@ -263,11 +263,11 @@ BLANK_LAYOUTS = {
 
 # Human-facing names for the layout gallery.
 LAYOUT_LABELS = {
-    "title_slide": "Title slide",
+    "title_slide": "Title (cover)",
     "title_content": "Narrative + exhibit",
     "two_content": "Two panels",
     "table": "Full-width exhibit",
-    "section_break": "Section header",
+    "section_break": "Topic divider",
     "blank": "Headline only",
 }
 

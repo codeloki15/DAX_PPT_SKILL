@@ -36,6 +36,9 @@ body{margin:0;padding:0;}
   padding:6px 8px;border-bottom:1.5px solid #12263F;}
 .slide-container td{padding:7px 8px;border-bottom:1px solid #E1E6EC;color:#3C4456;vertical-align:top;line-height:1.35;}
 .slide-container td b{color:#221F20;font-weight:600;}
+/* Short tables that should fill their panel: more air per row, never smaller type */
+.slide-container table.roomy th{padding:9px 10px;}
+.slide-container table.roomy td{padding:14px 10px;font-size:13px;}
 .slide-container .num{font-variant-numeric:tabular-nums;text-align:right;}
 .slide-container .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:0;}
 .slide-container .dot.pos{background:#1F7A5C;}
@@ -53,11 +56,20 @@ body{margin:0;padding:0;}
 .slide-container .slot{border:1.5px dashed #C9D1DB;color:#5F6F82;font-size:12px;display:flex;align-items:center;
   justify-content:center;text-align:center;padding:14px;min-height:56px;}
 
-/* Title and section slides */
-.slide-container.cover{padding:0 96px;}
-.slide-container .cover-inner{flex:1;display:flex;flex-direction:column;justify-content:center;}
-.slide-container .cover-title{font-size:42px;font-weight:600;line-height:1.18;color:#12263F;margin:0;max-width:980px;letter-spacing:-.01em;}
-.slide-container .cover-rule{width:88px;height:3px;background:#00A0DC;margin:26px 0 20px;}
-.slide-container .cover-sub{font-size:18px;font-weight:300;line-height:1.5;color:#3C4456;margin:0;max-width:900px;}
-.slide-container .sec-num{font-size:60px;font-weight:300;line-height:1;color:#007BAD;margin:0 0 16px;}
-.slide-container .cover .foot,.slide-container.cover .foot{margin-bottom:22px;}
+/* Cover (title) and topic (section) slides: Data Axle brand backgrounds.
+   The background is an <img>, not CSS, so it exports as a picture behind the
+   editable text. Container colours match the images for contrast checks. */
+.slide-container.cover-dark{background:#3C4457;padding:0;}
+.slide-container.cover-light{background:#D8DCE3;padding:0;}
+.slide-container .bg{position:absolute;left:0;top:0;width:1280px;height:720px;object-fit:cover;display:block;z-index:0;}
+.slide-container .cover-inner{position:relative;z-index:1;display:flex;flex-direction:column;padding:0 0 0 88px;}
+.slide-container.cover-dark .cover-inner{padding-top:232px;max-width:800px;}
+.slide-container.cover-light .cover-inner{flex:1;justify-content:center;max-width:960px;padding-bottom:40px;}
+.slide-container .cover-kicker{font-size:28px;font-weight:700;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:#509AD2;margin:0 0 6px;}
+.slide-container.cover-light .cover-kicker{font-size:13px;letter-spacing:.14em;color:#3C4456;margin:0 0 12px;}
+.slide-container .cover-title{font-size:50px;font-weight:700;line-height:1.2;color:#FFFFFF;margin:0;max-width:720px;}
+.slide-container.cover-light .cover-title{font-size:42px;color:#1C283C;max-width:880px;}
+.slide-container .cover-sub{font-size:18px;font-weight:300;line-height:1.5;color:#D5DBE3;margin:18px 0 0;max-width:640px;}
+.slide-container.cover-light .cover-sub{font-size:17px;font-weight:400;color:#3C4456;max-width:760px;}
+.slide-container .cover-date{position:absolute;left:88px;bottom:40px;z-index:1;font-size:12px;color:#AEB6C3;}
+.slide-container .cover-kicker:empty,.slide-container .cover-sub:empty,.slide-container .cover-date:empty{display:none;}

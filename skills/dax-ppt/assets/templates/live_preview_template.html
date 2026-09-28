@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Auto-refresh is handled in JS so in-page edits are never wiped -->
     <title>{{topic}} - DAX-PPT Maker</title>
+    <link rel="icon" type="image/svg+xml" href="{{brand_mark_uri}}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -112,15 +113,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            background: #FFFFFF;
+            border: 1px solid var(--border-default);
             border-radius: var(--radius-sm);
-            padding: 7px;
+            padding: 6px;
         }
 
-        .brand-icon svg {
+        .brand-icon img {
             width: 100%;
             height: 100%;
-            stroke: white;
+            display: block;
         }
 
         .brand-text {
@@ -2074,14 +2076,7 @@
         <div class="navbar-content">
             <div class="navbar-brand">
                 <div class="brand-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="3" width="20" height="14" rx="2" fill="rgba(255,255,255,0.1)"/>
-                        <path d="M8 21h8"/>
-                        <path d="M12 17v4"/>
-                        <path d="M7 8h4"/>
-                        <path d="M7 11h6"/>
-                        <rect x="14" y="7" width="4" height="5" rx="0.5" fill="rgba(255,255,255,0.2)"/>
-                    </svg>
+                    <img src="{{brand_mark_uri}}" alt="Data Axle">
                 </div>
                 <div class="brand-text">DAX-PPT MAKER <span>/ Data Axle</span></div>
             </div>

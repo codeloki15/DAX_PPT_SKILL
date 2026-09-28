@@ -12,11 +12,21 @@ margins, type sizes and footer are decided once, here, not per slide.
 
 import html
 import os
+import shutil
+from datetime import date
 from typing import Any, Dict, Optional
 
 import paths
 
 LAYOUT_DIR = os.path.join(paths.TEMPLATES_DIR, "layouts")
+BACKGROUND_DIR = os.path.join(paths.SKILL_DIR, "assets", "backgrounds")
+
+# Brand backgrounds a layout needs in the workspace images/ dir, as
+# (file in assets/backgrounds, name the slide references under ../images/).
+BACKGROUNDS = {
+    "title": ("cover-dark.png", "dax-bg-cover-dark.png"),
+    "section": ("topic-light.png", "dax-bg-topic-light.png"),
+}
 
 FONT_LINK = ('<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@'
              '0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>')
@@ -25,8 +35,9 @@ LAYOUTS = {
     "narrative":  ("narrative.html",  "Thesis, up to 3 iconed points and a takeaway on the left; one exhibit panel on the right. The default content slide."),
     "exhibit":    ("exhibit.html",    "Thesis, one full-width exhibit (a large chart or table), takeaway. For data-led slides."),
     "comparison": ("comparison.html", "Thesis, two exhibit panels side by side, takeaway. For A vs B, before/after, two segments."),
-    "title":      ("title.html",      "Deck cover: title, subtitle, date."),
-    "section":    ("section.html",    "Section divider: number, section title, one line of framing."),
+    "title":      ("title.html",      "Deck cover on the Data Axle dark background: DATA AXLE kicker, title, date. Always slide 1."),
+    "section":    ("section.html",    "Topic divider on the Data Axle light background: the topic name. Put one before each topic."),
+    "topic":      ("section.html",    "Alias of section."),
     "blank":      ("blank.html",      "Headline and footer only. Use only when no layout above fits."),
 }
 
@@ -51,6 +62,30 @@ DEFAULTS = {
 }
 
 
+# Per-layout defaults that differ from DEFAULTS. Cover and topic slides have no
+# footer, and their kicker is optional.
+LAYOUT_DEFAULTS = {
+    "title": {"kicker": "Data-Axle", "subtitle": "",
+              "title": "Replace with the deck title, about 40 characters (two lines)"},
+    "section": {"kicker": "", "subtitle": "",
+                "title": "Replace with the topic name, 2-7 words"},
+}
+LAYOUT_DEFAULTS["topic"] = LAYOUT_DEFAULTS["section"]
+BACKGROUNDS["topic"] = BACKGROUNDS["section"]
+
+
+def _install_background(layout: str) -> None:
+    """Copy the layout's brand background into the workspace images/ dir, where
+    the slide, the preview inliner and the verify screenshot all resolve it."""
+    if layout not in BACKGROUNDS:
+        return
+    src_name, dst_name = BACKGROUNDS[layout]
+    dst = os.path.join(paths.IMAGES_DIR, dst_name)
+    if not os.path.exists(dst):
+        os.makedirs(paths.IMAGES_DIR, exist_ok=True)
+        shutil.copy2(os.path.join(BACKGROUND_DIR, src_name), dst)
+
+
 def list_layouts() -> Dict[str, Any]:
     return {"status": "ok",
             "layouts": [{"name": k, "use_for": v[1]} for k, v in LAYOUTS.items()],
@@ -66,11 +101,17 @@ def render(layout: str, slots: Optional[Dict[str, str]] = None, page: str = "") 
     with open(os.path.join(LAYOUT_DIR, fname), "r", encoding="utf-8") as f:
         body = f.read()
     values = dict(DEFAULTS, page=page)
+    values.update(LAYOUT_DEFAULTS.get(layout, {}))
+    if layout == "title":
+        values["date"] = date.today().strftime("%B %Y")
     for k, v in (slots or {}).items():
         if v is not None:
             values[k] = v
     for k, v in values.items():
-        body = body.replace("{{" + k + "}}", html.escape(str(v), quote=False))
+        # The brand name never breaks across lines ("... by Data / Axle").
+        text = str(v).replace("Data Axle", "Data\u00a0Axle")
+        body = body.replace("{{" + k + "}}", html.escape(text, quote=False))
+    _install_background(layout)
     title_text = values.get("title") or layout
     return ("<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"/>\n"
             "<meta content=\"width=device-width, initial-scale=1.0\" name=\"viewport\"/>\n"
@@ -90,7 +131,8 @@ def new_slide(slide_number: int, layout: str, slots: Optional[Dict[str, str]] = 
     doc = render(layout, slots, page=str(slide_number))
     with open(path, "w", encoding="utf-8") as f:
         f.write(doc)
-    remaining = sorted({k for k in DEFAULTS if DEFAULTS[k].startswith(PLACEHOLDER)
+    defaults = dict(DEFAULTS, **LAYOUT_DEFAULTS.get(layout, {}))
+    remaining = sorted({k for k in defaults if str(defaults[k]).startswith(PLACEHOLDER)
                         and "{{" + k + "}}" in open(os.path.join(LAYOUT_DIR, LAYOUTS[layout][0])).read()
                         and not (slots or {}).get(k)})
     return {

@@ -52,8 +52,8 @@ dax.py --workspace WS slide new --slide 2 --layout narrative \
 | `narrative` | **The default content slide.** Thesis, up to 3 iconed points and a takeaway on the left; one exhibit panel on the right |
 | `exhibit` | A data-led slide: thesis, one full-width chart or table, takeaway |
 | `comparison` | A vs B, before/after, two segments: thesis, two panels side by side, takeaway |
-| `title` | Deck cover |
-| `section` | Section divider |
+| `title` | **Deck cover, always slide 1.** Data Axle dark background; DATA-AXLE kicker, title, date |
+| `topic` (alias `section`) | **Topic divider before each new topic.** Data Axle light background; the topic name |
 | `blank` | Headline and footer only. Use it only when nothing above fits |
 
 The new file contains dashed **slot** boxes, for example "Replace with the points
@@ -80,6 +80,36 @@ Source: where every figure comes from                          (10px, muted)
 ──────────────────────────────────────────────────────────────
 Exhibit 1 | what it shows                       Data Axle | Deck title | 3
 ```
+
+## Deck structure: cover and topic slides
+
+Data Axle decks tell the audience when a new topic starts. Every deck follows this
+shape:
+
+```
+slide 1   title   cover: DATA-AXLE kicker, deck title, date          (dark brand background)
+slide 2   topic   "Market Dynamics and Competitive Bar"               (light brand background)
+slide 3+  content slides for that topic (narrative / exhibit / comparison)
+slide n   topic   the next topic's name
+          content slides ...
+```
+
+```bash
+dax.py --workspace WS slide new --slide 1 --layout title --title "Vision: From Data Provider to AI Platform"
+dax.py --workspace WS slide new --slide 2 --layout topic --title "Market Dynamics and Competitive Bar"
+```
+
+- **Cover title:** about 40 characters, so it sets on two lines at 50px ("Salesgenie: Sales
+  Leads on Demand"). `verify` warns at three lines; shorten it rather than shrinking the type. The date defaults to the
+  current month and year; override it with `--date`. The kicker defaults to
+  DATA-AXLE.
+- **Topic name:** 2 to 7 words. This is the one place a title is a label rather
+  than a finding: it names the topic, and the content slides that follow carry
+  the findings. It can have an optional `--subtitle`.
+- Both slides use the brand background images in `assets/backgrounds/`, which
+  `slide new` copies into the deck. Don't add points, panels or footers to them.
+- A deck with one topic still gets a cover. Use topic dividers once there are two
+  or more topics.
 
 ## Type scale
 
@@ -176,7 +206,9 @@ fact a reader should catch.
 *Implication*, *Forecast*, *Recommendation*.
 
 **Scorecard**: a compact metric → status list with semantic status colours. It
-suits a panel on its own or under a chart.
+suits a panel on its own or under a chart. When it's the panel's **only**
+content, pass `"fill": true` so its rows spread over the panel instead of leaving
+the bottom empty.
 `--data '{"columns":["Dimension","Status"],"rows":[{"label":"Coverage","status":"Ahead of plan","state":"positive"}]}'`
 
 **Chart**: the exhibit panel's main content. See [charts.md](charts.md).
@@ -187,7 +219,9 @@ suits a panel on its own or under a chart.
   series, one holding the negatives and one the positives, zeros elsewhere. Pass
   `--colors A9B4C2,12263F`.
 
-**Table**: plain `<table>` with `<thead>` and `<tbody>`, 6 rows at most. It
+**Table**: plain `<table>` with `<thead>` and `<tbody>`, 6 rows at most. Give a
+short table (3–4 rows) `class="roomy"` so its rows spread out and fill the panel
+instead of leaving dead space below. It
 exports as a native PowerPoint table. Mark status with a dot before the text:
 `<span class="dot pos"></span>Low`. The classes are `pos`, `warn`, `neg` and
 `neutral`.
@@ -226,7 +260,9 @@ files are shared state: re-read a slide before editing it.
 
 - **issues** (hard failures): overflow past the frame, or an unfilled layout slot
 - **warnings** (house style): body copy over 170 words, running text under 12px,
-  text under 10px, and text below the contrast rule
+  text under 10px, text below the contrast rule, a title running past two lines,
+  and **dead space**: an empty block bigger than 15% of the body, such as a panel
+  whose exhibit fills only its top third
 
 Fix both, re-verify, then **read the screenshot and look at it**. Check for dead
 space, cramped panels, and styling that differs from the other slides.
@@ -234,6 +270,7 @@ space, cramped panels, and styling that differs from the other slides.
 ## Critical rules
 
 1. Every slide starts from a layout (`dax.py slide new`). Never hand-write the frame or the CSS.
+   Slide 1 is the `title` cover; each new topic opens with a `topic` divider.
 2. Every title is an action title: the finding, 16 words or fewer.
 3. One thesis line, at most three points, one exhibit panel, one takeaway.
 4. Stay within the word budgets. Cut words; never shrink type below the floors.
@@ -258,5 +295,5 @@ space, cramped panels, and styling that differs from the other slides.
 | `.chart-embed` | Chart placeholder (from `dax.py chart`) |
 | `table`, `th`, `td`, `.num`, `.dot.pos/.warn/.neg/.neutral` | Tables |
 | `.src`, `.foot` | Source line, footer |
-| `.cover`, `.cover-title`, `.cover-rule`, `.cover-sub`, `.sec-num` | Title and section slides |
+| `.cover-dark` / `.cover-light`, `.bg`, `.cover-kicker`, `.cover-title`, `.cover-sub`, `.cover-date` | Cover (dark background) and topic (light background) slides |
 | `.slot` | Unfilled layout slot (must not survive) |

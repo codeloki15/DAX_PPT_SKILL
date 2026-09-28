@@ -52,7 +52,12 @@ Establish, asking the user only for what you cannot infer:
 - **Data** — a CSV/Excel path, or figures they supply. No data is a red flag:
   read "Never invent numbers" below before proceeding.
 
-Then **write the action titles first**, as a plain list, and show the user.
+Then **write the storyline first**, as a plain list, and show the user:
+
+- the **cover** title
+- each **topic** name (a topic divider opens each one)
+- under each topic, the **action titles** of its content slides
+
 Titles are the argument; if they don't hold together, the deck won't either.
 Get agreement on that list before building slides.
 
@@ -94,10 +99,15 @@ dax.py --workspace WS slide new --slide 2 --layout narrative \
 | `narrative` | **Default.** Thesis, up to 3 iconed points and a takeaway on the left; one exhibit panel on the right |
 | `exhibit` | Data-led: thesis, one full-width chart or table, takeaway |
 | `comparison` | A vs B: thesis, two panels side by side, takeaway |
-| `title` / `section` | Deck cover / section divider |
+| `title` | **Slide 1, always.** Cover on the Data Axle dark background: DATA-AXLE kicker, title, date |
+| `topic` | **Before each new topic.** Divider on the Data Axle light background: the topic name (2-7 words) |
 
 The new slide contains dashed **slot** boxes ("Replace with the points
 exhibit…"). Replace each one with the HTML from the builder it names (step 4).
+
+Deck shape: **cover → topic → its content slides → topic → its content slides →
+…** The dividers tell the audience a new topic is starting. Build them with
+`slide new --layout title` and `--layout topic`; they need nothing else.
 
 What makes a slide look professional rather than a text dump (the full contract
 is in [references/design_system.md](references/design_system.md), **read it
@@ -151,10 +161,11 @@ positives in two series. Types:
 Details: [references/charts.md](references/charts.md).
 
 **Scorecard**: a metric → status list, with the status coloured by state. Put
-it under the chart or on its own:
+it under the chart, or on its own with `"fill": true` so it fills the panel:
 `--type scorecard --data '{"columns":["Dimension","Status"],"rows":[{"label":"Coverage","status":"Ahead of plan","state":"positive"}]}'`
 
-**Tables**: plain `<table>` with `<thead>` and `<tbody>`, 6 rows at most. Mark
+**Tables**: plain `<table>` with `<thead>` and `<tbody>`, 6 rows at most
+(`class="roomy"` for a short table that should fill its panel). Mark
 status with `<span class="dot pos"></span>`. Tables export as native PowerPoint
 tables.
 
@@ -175,7 +186,8 @@ This renders the slide headlessly at exactly 1280x720 and returns:
 
 - **issues**: overflow past the frame, or an unfilled layout slot
 - **warnings**: more than 170 words of body copy, running text under 12px, text
-  under 10px, or text below the contrast rule
+  under 10px, text below the contrast rule, a title longer than two lines, or
+  **dead space** (an empty block bigger than 15% of the body)
 
 Fix both kinds and re-verify. **Then read the returned `image_path` and look at
 the screenshot.** The checks catch hard failures; only your eyes catch a cramped

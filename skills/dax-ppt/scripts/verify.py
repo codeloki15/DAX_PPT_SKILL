@@ -58,6 +58,9 @@ _METRICS_JS = """
 # House-style limits. Measured against a reference deck: slides that read as
 # "clean" kept running text >= 12px and body copy near 150 words.
 BODY_WORD_BUDGET = 170
+MAX_TITLE_LINES = 2
+DEAD_SPACE_PCT = 15          # largest empty block, as % of the body area
+CELL = 20                    # px grid used for the dead-space scan
 MIN_TEXT_PX = 10
 MIN_BODY_PX = 12
 PLACEHOLDER = "Replace with"
@@ -97,6 +100,77 @@ _QUALITY_JS = r"""
   return out;
 }
 """
+
+
+_LAYOUT_JS = r"""
+() => {
+  const root = document.querySelector('.slide-container') || document.body;
+  const oy = root.getBoundingClientRect().top;
+  const titles = [...root.querySelectorAll('.action, .cover-title')].map(el => {
+    const cs = getComputedStyle(el);
+    const lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.2;
+    return {lines: Math.round(el.getBoundingClientRect().height / lh), text: el.innerText.trim().slice(0, 60)};
+  });
+  const rule = root.querySelector('.rule');
+  const end = root.querySelector('.src') || root.querySelector('.foot');
+  // Structured exhibits: whitespace inside their grid is intentional, not dead space.
+  const blocks = [...root.querySelectorAll('table, .chart-embed, canvas, img:not(.bg)')].map(el => {
+    const r = el.getBoundingClientRect();
+    return {x: r.left, y: r.top - oy, w: r.width, h: r.height};
+  }).filter(b => b.w > 0 && b.h > 0);
+  return {titles, blocks,
+          bodyTop: rule ? rule.getBoundingClientRect().bottom - oy : null,
+          bodyBottom: end ? end.getBoundingClientRect().top - oy : null};
+}
+"""
+
+
+def _dead_space(png_path, top, bottom, blocks=()):
+    """Largest all-empty rectangle in the body, as % of the body area. A cell is empty
+    when it holds no marks - flat panel fill counts as empty, because fill without
+    content is dead space."""
+    try:
+        import numpy as np
+        from PIL import Image
+    except ImportError:
+        return None, None
+    a = np.asarray(Image.open(png_path).convert("RGB"), dtype=np.int16)
+    r0, r1 = int(np.ceil(top / CELL)), int(np.floor(bottom / CELL))
+    if r1 - r0 < 3:
+        return None, None
+    cols = SLIDE_W // CELL
+    marked = np.zeros((r1 - r0, cols), dtype=bool)
+    for r in range(r0, r1):
+        for c in range(cols):
+            cell = a[r * CELL:(r + 1) * CELL, c * CELL:(c + 1) * CELL].reshape(-1, 3)
+            q = cell // 16
+            keys, counts = np.unique(q[:, 0] * 256 + q[:, 1] * 16 + q[:, 2], return_counts=True)
+            k = keys[counts.argmax()]
+            dom = np.array([k // 256, (k // 16) % 16, k % 16]) * 16 + 8
+            marked[r - r0, c] = (np.abs(cell - dom).sum(axis=1) > 60).mean() > 0.03
+    for b in blocks:                      # tables, charts, images count as content
+        c0, c1 = int(b["x"] // CELL), int(np.ceil((b["x"] + b["w"]) / CELL))
+        y0, y1 = int(b["y"] // CELL) - r0, int(np.ceil((b["y"] + b["h"]) / CELL)) - r0
+        marked[max(0, y0):max(0, y1), max(0, c0):max(0, c1)] = True
+    # ignore the outer margins: only the content width counts
+    inner = marked[:, 3:cols - 3]
+    best, best_box, hist = 0, None, np.zeros(inner.shape[1], dtype=int)
+    for y, row in enumerate(~inner):
+        hist = np.where(row, hist + 1, 0)
+        stack = []
+        for x, h in enumerate(list(hist) + [0]):
+            start = x
+            while stack and stack[-1][1] >= h:
+                s, sh = stack.pop()
+                if sh * (x - s) > best:
+                    best, best_box = sh * (x - s), (s, y - sh + 1, x - s, sh)
+                start = s
+            stack.append((start, h))
+    pct = 100.0 * best / inner.size
+    if best_box is None:
+        return round(pct, 1), None
+    s, y, w, h = best_box
+    return round(pct, 1), {"x": (s + 3) * CELL, "y": (y + r0) * CELL, "w": w * CELL, "h": h * CELL}
 
 
 def _quality(runs):
@@ -178,6 +252,7 @@ def screenshot_slide(slide_number: int) -> Dict[str, Any]:
             _render_charts(page)
             metrics = page.evaluate(_METRICS_JS)
             runs = page.evaluate(_QUALITY_JS)
+            shape = page.evaluate(_LAYOUT_JS)
             page.screenshot(path=image_path,
                             clip={"x": 0, "y": 0, "width": SLIDE_W, "height": SLIDE_H})
             browser.close()
@@ -199,6 +274,20 @@ def screenshot_slide(slide_number: int) -> Dict[str, Any]:
     slot_issues, warnings, body_words = _quality(runs)
     issues += slot_issues
 
+    for t in shape["titles"]:
+        if t["lines"] > MAX_TITLE_LINES:
+            warnings.append(f"Title runs to {t['lines']} lines ('{t['text']}'). Keep it to "
+                            f"{MAX_TITLE_LINES}: shorten it rather than shrinking the type.")
+
+    dead_pct, dead_box = (None, None)
+    if shape["bodyTop"] is not None and shape["bodyBottom"] is not None and not overflow:
+        dead_pct, dead_box = _dead_space(image_path, shape["bodyTop"], shape["bodyBottom"],
+                                         shape.get("blocks", []))
+        if dead_pct is not None and dead_pct > DEAD_SPACE_PCT and dead_box:
+            warnings.append(f"Dead space: an empty {dead_box['w']}x{dead_box['h']}px block at "
+                            f"x={dead_box['x']}, y={dead_box['y']} ({dead_pct}% of the body). Fill it "
+                            "(e.g. scorecard fill:true, a larger chart) or use a layout with less room.")
+
     if issues:
         message = "Fix the issues below and re-verify."
     elif warnings:
@@ -215,5 +304,6 @@ def screenshot_slide(slide_number: int) -> Dict[str, Any]:
         "issues": issues,
         "warnings": warnings,
         "body_words": body_words,
+        "dead_space_pct": dead_pct,
         "message": message,
     }

@@ -267,6 +267,9 @@ def cmd_doctor(args):
         p_ = os.path.join(paths.TEMPLATES_DIR, asset)
         check(f"asset:{asset}", os.path.exists(p_), p_,
               "Re-install the skill; assets/templates/ is incomplete.")
+    mark = os.path.join(paths.SKILL_DIR, "assets", "brand", "data-axle-mark.svg")
+    check("asset:data-axle-mark.svg", os.path.exists(mark), mark,
+          "Re-install the skill; assets/brand/ is incomplete.")
     icons_manifest = os.path.join(paths.SKILL_DIR, "assets", "icons", "icons.json")
     check("asset:icons.json", os.path.exists(icons_manifest), icons_manifest,
           "Re-install the skill; assets/icons/ is incomplete.")
@@ -305,7 +308,7 @@ def build_parser():
     sl = sub.add_parser("slide", help="Start a slide from a house layout")
     sl.add_argument("action", choices=["new", "layouts"])
     sl.add_argument("--slide", type=int, help="Slide number (writes slides/slide_NNN.html)")
-    sl.add_argument("--layout", choices=["narrative", "exhibit", "comparison", "title", "section", "blank"])
+    sl.add_argument("--layout", choices=["narrative", "exhibit", "comparison", "title", "section", "topic", "blank"])
     for k in SLOT_FLAGS:
         sl.add_argument("--" + k.replace("_", "-"), dest=k)
     sl.add_argument("--set", action="append", metavar="KEY=VALUE", help="Any other slot")

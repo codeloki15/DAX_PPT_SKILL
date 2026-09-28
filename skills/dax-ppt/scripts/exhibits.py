@@ -71,12 +71,12 @@ def _build_timeline(data: Dict[str, Any]) -> str:
 
     cells = []
     for it in items:
-        desc = (f'<div style="font-size:10.5px;line-height:1.4;color:{SLATE};margin-top:4px;">'
+        desc = (f'<div style="font-size:12px;line-height:1.45;color:{SLATE};margin-top:4px;">'
                 f'{_esc(it.get("description"))}</div>') if it.get("description") else ""
         cells.append(f'''<div style="flex:1;min-width:0;padding:0 8px;">
   <div style="font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:{BLUE_TEXT};font-weight:700;margin-bottom:6px;">{_esc(it.get("label"))}</div>
   <div style="width:10px;height:10px;background:{BRAND_BLUE};border-radius:50%;margin-bottom:10px;position:relative;z-index:1;"></div>
-  <div style="font-size:12px;font-weight:600;color:{NAVY};line-height:1.35;">{_esc(it.get("title"))}</div>
+  <div style="font-size:13px;font-weight:600;color:{NAVY};line-height:1.35;">{_esc(it.get("title"))}</div>
   {desc}
 </div>''')
 
@@ -97,12 +97,12 @@ def _build_process_flow(data: Dict[str, Any]) -> str:
     for i, step in enumerate(steps):
         if i:
             parts.append(f'<div style="flex:0 0 auto;align-self:center;color:{MUTED};'
-                         f'font-size:16px;padding:0 6px;">&#8594;</div>')
-        border = f"1.5px solid {BRAND_BLUE}" if i in emphasize else f"1px solid {RULE}"
-        desc = (f'<div style="font-size:10.5px;line-height:1.4;color:{SLATE};padding:8px 10px;">'
+                         f'font-size:18px;padding:0 8px;">&#8594;</div>')
+        border = f"1.5px solid {BRAND_BLUE}" if i in emphasize else "1px solid #E1E6EC"
+        desc = (f'<div style="font-size:12.5px;line-height:1.5;color:{SLATE};padding:12px 14px 14px;">'
                 f'{_esc(step.get("description"))}</div>') if step.get("description") else ""
         parts.append(f'''<div style="flex:1;min-width:0;border:{border};background:#fff;">
-  <div style="background:{NAVY};color:#fff;font-size:10.5px;font-weight:600;padding:6px 10px;">
+  <div style="background:{NAVY};color:#fff;font-size:13px;font-weight:600;padding:9px 14px;">
     <span style="color:{BRAND_BLUE};font-weight:700;margin-right:6px;">{i + 1}</span>{_esc(step.get("title"))}
   </div>
   {desc}
@@ -127,7 +127,7 @@ def _build_funnel(data: Dict[str, Any]) -> str:
         value = (f'<span style="font-weight:700;margin-left:10px;">{_esc(stage.get("value"))}</span>'
                  if stage.get("value") is not None else "")
         rows.append(f'''<div style="display:flex;justify-content:center;">
-  <div style="width:{width:.0f}%;background:{bg};opacity:{opacity};color:#fff;font-size:11.5px;
+  <div style="width:{width:.0f}%;background:{bg};opacity:{opacity};color:#fff;font-size:12.5px;
     padding:8px 14px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;">
     <span>{_esc(stage.get("label"))}</span>{value}
   </div>
@@ -150,7 +150,7 @@ def _build_matrix_2x2(data: Dict[str, Any]) -> str:
         border = f"1.5px solid {BRAND_BLUE}" if i == highlight else f"1px solid {RULE}"
         bg = "#fff" if i == highlight else LIGHT
         items = "".join(
-            f'<li style="padding-left:13px;position:relative;margin-bottom:4px;font-size:10.5px;'
+            f'<li style="padding-left:13px;position:relative;margin-bottom:4px;font-size:12px;'
             f'line-height:1.4;color:{SLATE};">'
             f'<span style="position:absolute;left:0;top:5px;width:5px;height:5px;background:{BRAND_BLUE};"></span>'
             f'{_esc(item)}</li>'
@@ -158,7 +158,7 @@ def _build_matrix_2x2(data: Dict[str, Any]) -> str:
         )
         item_list = f'<ul style="list-style:none;padding:0;margin:6px 0 0;">{items}</ul>' if items else ""
         cells.append(f'''<div style="border:{border};background:{bg};padding:10px 12px;min-height:0;overflow:hidden;">
-  <div style="font-size:11.5px;font-weight:600;color:{NAVY};">{_esc(q.get("title"))}</div>
+  <div style="font-size:13px;font-weight:600;color:{NAVY};">{_esc(q.get("title"))}</div>
   {item_list}
 </div>''')
 
@@ -206,7 +206,7 @@ def _build_harvey_table(data: Dict[str, Any]) -> str:
             for s in scores
         )
         body_rows.append(
-            f'<tr><td style="padding:7px 10px;border-bottom:1px solid {RULE};font-size:11.5px;'
+            f'<tr><td style="padding:7px 10px;border-bottom:1px solid {RULE};font-size:12.5px;'
             f'color:{BLACK};font-weight:600;">{_esc(r.get("label"))}</td>{cells}</tr>')
 
     legend = (f'<div style="font-size:10px;color:{MUTED};margin-top:7px;">'
@@ -227,7 +227,7 @@ def _build_kpi_row(data: Dict[str, Any]) -> str:
     for k in kpis:
         state = k.get("state")
         delta_color = STATE_TEXT.get(state, MUTED)
-        delta = (f'<div style="font-size:11.5px;font-weight:600;color:{delta_color};margin-top:4px;">'
+        delta = (f'<div style="font-size:12px;font-weight:600;color:{delta_color};margin-top:4px;">'
                  f'{_esc(k.get("delta"))}</div>') if k.get("delta") else ""
         tiles.append(f'''<div style="flex:1;min-width:0;background:{LIGHT};border-top:3px solid {NAVY};padding:14px 16px;">
   <div style="font-size:30px;font-weight:600;color:{NAVY};line-height:1.1;font-variant-numeric:tabular-nums;">{_esc(k.get("value"))}</div>
@@ -290,8 +290,10 @@ def _build_takeaway(data: Dict[str, Any]) -> Tuple[str, List[str]]:
 
 
 def _build_scorecard(data: Dict[str, Any]) -> str:
-    """data: {rows: [{label, status, state?}], columns?: [left, right]} - a compact
-    metric -> status list. state: positive | warning | negative | neutral (colours the status)."""
+    """data: {rows: [{label, status, state?}], columns?: [left, right], fill?: bool} - a compact
+    metric -> status list. state: positive | warning | negative | neutral (colours the status).
+    fill: true spreads the rows over the whole panel - use it when the scorecard is the
+    panel's only content, so the panel has no dead space."""
     rows = data.get("rows") or []
     if not 2 <= len(rows) <= 7:
         raise ValueError("scorecard needs 2-7 rows: [{label, status, state?}]")
@@ -299,6 +301,7 @@ def _build_scorecard(data: Dict[str, Any]) -> str:
     if len(cols) != 2:
         raise ValueError("scorecard columns must be two headings: [left, right]")
     head = (f'<div style="display:flex;justify-content:space-between;gap:16px;padding:0 0 6px;'
+            f'{"margin-top:10px;" if data.get("fill") else ""}'
             f'border-bottom:1.5px solid {NAVY};font-size:10px;font-weight:600;letter-spacing:.07em;'
             f'text-transform:uppercase;color:{MUTED};"><span>{_esc(cols[0])}</span><span>{_esc(cols[1])}</span></div>')
     body = []
@@ -306,11 +309,13 @@ def _build_scorecard(data: Dict[str, Any]) -> str:
         state = r.get("state") or "neutral"
         if state not in STATE_TEXT:
             raise ValueError(f"state '{state}' must be one of positive, warning, negative, neutral")
-        body.append(f'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;'
+        grow = "flex:1 1 0;max-height:68px;align-items:center;" if data.get("fill") else "align-items:baseline;"
+        body.append(f'<div style="display:flex;justify-content:space-between;{grow}gap:16px;'
                     f'padding:7px 0;border-bottom:1px solid #E1E6EC;">'
                     f'<span style="color:{SLATE};">{_esc(r.get("label"))}</span>'
                     f'<span style="color:{STATE_TEXT[state]};font-weight:600;text-align:right;">{_esc(r.get("status"))}</span></div>')
-    return f'<div style="font-size:12.5px;line-height:1.35;">{head}{"".join(body)}</div>'
+    size = "font-size:13.5px;flex:1;display:flex;flex-direction:column;min-height:0;" if data.get("fill") else "font-size:12.5px;"
+    return f'<div style="{size}line-height:1.35;">{head}{"".join(body)}</div>'
 
 
 _BUILDERS = {

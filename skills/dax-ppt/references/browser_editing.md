@@ -174,11 +174,11 @@ the deck:
 
 | id | Gallery label | House layout |
 |---|---|---|
-| `title_slide` | Title slide | `title` |
+| `title_slide` | Title (cover) | `title` (dark brand background) |
 | `title_content` | Narrative + exhibit | `narrative` |
 | `two_content` | Two panels | `comparison` |
 | `table` | Full-width exhibit | `exhibit` |
-| `section_break` | Section header | `section` |
+| `section_break` | Topic divider | `section` (light brand background) |
 | `blank` | Headline only | `blank` |
 
 The new slide carries the deck title (from `deck_meta.json`) and its page number, plus dashed

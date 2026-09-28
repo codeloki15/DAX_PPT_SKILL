@@ -14,7 +14,9 @@ use the `scripts/dax.py` that sits next to the skill's SKILL.md.
 2. Pick one workspace for this deck (default `./dax_workspace`) and pass `--workspace` on every call.
 3. If there is a data file, `profile` it and `aggregate` every figure you will show. Never invent numbers.
 4. Write the action titles first as a numbered list and get the user's agreement before building.
-5. Start every slide from a house layout (`slide new --layout narrative|exhibit|comparison|title|section`)
+5. Slide 1 is the cover (`slide new --layout title`), and each topic opens with a divider
+   (`slide new --layout topic --title "<topic name>"`).
+   Start every other slide from a house layout (`slide new --layout narrative|exhibit|comparison|title|section`)
    and fill its slots with the builders: `points`, `takeaway`, `scorecard`, `chart`. Keep to the
    word budgets (170 words of body copy per slide) - cut words, never shrink type.
 6. `verify` every slide: fix every issue AND every warning, then look at each screenshot.

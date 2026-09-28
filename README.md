@@ -16,7 +16,8 @@ You describe the deck; the agent builds it. Under the hood:
 | Capability | How |
 |---|---|
 | **House style** | Every slide is 1280x720 HTML on white, Poppins throughout, locked to the Data Axle palette. The Data Axle headline and footer frame a calm body: one thesis line, up to three iconed points, one exhibit panel, one takeaway. |
-| **Slide layouts** | `dax.py slide new --layout narrative` (also `exhibit`, `comparison`, `title`, `section`) starts every slide from the same frame and stylesheet, so a deck looks designed rather than assembled. Word budgets and type floors keep it from becoming a text dump. |
+| **Cover and topic slides** | Every deck opens on the Data Axle cover (dark brand background, DATA-AXLE kicker, title, date), and each new topic opens with a divider on the light brand background, so the audience always knows a topic is starting. |
+| **Slide layouts** | `dax.py slide new --layout narrative` (also `exhibit`, `comparison`, `title`, `topic`) starts every slide from the same frame and stylesheet, so a deck looks designed rather than assembled. Word budgets and type floors keep it from becoming a text dump. |
 | **Action titles** | Every title states the finding, not the topic — read the titles in order and you have the argument. |
 | **Native charts** | `dax.py chart` stores a structured spec. It renders live with Chart.js in the preview and becomes a **real PowerPoint chart** on export — recipients can right-click → *Edit Data*. 9 types including waterfall. |
 | **Native tables** | Plain `<table>` markup is rebuilt as a real PowerPoint table, so every cell stays editable text instead of a flattened picture. |
@@ -153,7 +154,8 @@ skills/dax-ppt/
 └── assets/
     ├── templates/            live preview, editor, native export, chart renderer
     │   └── layouts/          house.css + narrative, exhibit, comparison, title, section
-    └── icons/                54 icons + logo, icons.json manifest, ATTRIBUTION.md
+    ├── icons/                54 icons + logo, icons.json manifest, ATTRIBUTION.md
+    └── backgrounds/          Data Axle cover (dark) and topic (light) backgrounds
 ```
 
 ### Export pipeline

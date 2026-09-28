@@ -90,6 +90,7 @@ dax.py --workspace WS exhibit --type scorecard --data '{"columns":["Dimension","
 | `rows` | 2-7 of `{label, status, state?}` |
 | `state` | `positive` / `warning` / `negative` / `neutral` (default). Colours meet 4.5:1, and warning uses the darker `#8F6212` |
 | `columns` | optional, exactly two headings; default `["Metric","Status"]` |
+| `fill` | optional. `true` spreads the rows over the whole panel at 13.5px. Use it when the scorecard is the panel's only content, otherwise `verify` reports the empty bottom as dead space |
 
 It's built from divs, not a `<table>`, so the state colours survive export as editable coloured
 text.

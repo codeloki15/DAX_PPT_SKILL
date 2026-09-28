@@ -63,6 +63,16 @@ def load_template(template_name: str) -> str:
         return f.read()
 
 
+def brand_mark_uri() -> str:
+    """The Data Axle mark as a data URI, used for the preview's favicon and header."""
+    path = os.path.join(paths.SKILL_DIR, "assets", "brand", "data-axle-mark.svg")
+    try:
+        with open(path, "rb") as f:
+            return "data:image/svg+xml;base64," + base64.b64encode(f.read()).decode("ascii")
+    except OSError:
+        return ""
+
+
 def image_to_base64(image_path: str) -> Optional[str]:
     """Convert a local image file to a base64 data URL."""
     if not image_path or not os.path.exists(image_path):
@@ -216,6 +226,7 @@ def build_preview(title: str, total_slides: Optional[int] = None) -> Dict[str, A
     preview_html = preview_html.replace("{{slide_count}}", str(len(numbers)))
     preview_html = preview_html.replace("{{slides_content}}", slides_content)
     preview_html = preview_html.replace("{{topic_slug}}", topic_slug)
+    preview_html = preview_html.replace("{{brand_mark_uri}}", brand_mark_uri())
 
     # Inject stored chart specs so the preview renders live Chart.js charts in
     # every .chart-embed. "</" is escaped so a stray string in a spec cannot
